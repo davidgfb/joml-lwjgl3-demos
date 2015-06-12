@@ -44,6 +44,10 @@ public class ArcBallCameraDemo {
 
 			glfwDestroyWindow(window);
 			keyCallback.release();
+			fbCallback.release();
+			cpCallback.release();
+			sCallback.release();
+			mbCallback.release();
 		} finally {
 			glfwTerminate();
 			errorCallback.release();
@@ -219,15 +223,14 @@ public class ArcBallCameraDemo {
 			glLoadMatrixf(fb);
 
 			/*
-			 * Obtain the camera's view matrix and translate to target to render
-			 * the cube at that position.
+			 * Obtain the camera's view matrix and render grid.
 			 */
 			cam.viewMatrix(mat.identity()).get(fb);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadMatrixf(fb);
 			renderGrid();
 
-			/* Translate to cube position */
+			/* Translate to cube position and render cube */
 			mat.translate(cam.centerMover.target).get(fb);
 			glLoadMatrixf(fb);
 			renderCube();
