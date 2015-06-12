@@ -37,13 +37,6 @@ public class ArcBallCameraDemo {
 	int mouseX, mouseY;
 	boolean down;
 
-	// JOML matrices
-	Matrix4f projMatrix = new Matrix4f();
-	Matrix4f viewMatrix = new Matrix4f();
-
-	// FloatBuffer for transferring matrices to OpenGL
-	FloatBuffer fb = BufferUtils.createFloatBuffer(16);
-
 	void run() {
 		try {
 			init();
@@ -171,7 +164,8 @@ public class ArcBallCameraDemo {
 
 	void renderGrid() {
 		glBegin(GL_LINES);
-		for (int i = -20; i < 20; i++) {
+		glColor3f(0.2f, 0.2f, 0.2f);
+		for (int i = -20; i <= 20; i++) {
 			glVertex3f(-20.0f, 0.0f, i);
 			glVertex3f(20.0f, 0.0f, i);
 			glVertex3f(i, 0.0f, -20.0f);
@@ -184,7 +178,7 @@ public class ArcBallCameraDemo {
 		GLContext.createFromCurrent();
 
 		// Set the clear color
-		glClearColor(0.6f, 0.7f, 0.8f, 1.0f);
+		glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
 		// Enable depth testing
 		glEnable(GL_DEPTH_TEST);
 
@@ -192,6 +186,8 @@ public class ArcBallCameraDemo {
 		long lastTime = System.nanoTime();
 
 		Matrix4f mat = new Matrix4f();
+		// FloatBuffer for transferring matrices to OpenGL
+		FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 
 		float alpha = -20.0f;
 		float beta = 20.0f;
@@ -218,7 +214,7 @@ public class ArcBallCameraDemo {
 			glViewport(0, 0, width, height);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			projMatrix.setPerspective(45.0f, (float) width / height, 0.01f, 100.0f).get(fb);
+			mat.setPerspective(45.0f, (float) width / height, 0.01f, 100.0f).get(fb);
 			glMatrixMode(GL_PROJECTION);
 			glLoadMatrixf(fb);
 
