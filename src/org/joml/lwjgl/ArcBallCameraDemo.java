@@ -222,15 +222,15 @@ public class ArcBallCameraDemo {
 			 * Obtain the camera's view matrix and translate to target to render
 			 * the cube at that position.
 			 */
-			cam.viewMatrix(mat.identity()).translate(cam.centerMover.target).get(fb);
+			cam.viewMatrix(mat.identity()).get(fb);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadMatrixf(fb);
-			renderCube();
-
-			/* Translate back and render grid */
-			mat.translate(-cam.centerMover.target.x, -cam.centerMover.target.y, -cam.centerMover.target.z).get(fb);
-			glLoadMatrixf(fb);
 			renderGrid();
+
+			/* Translate to cube position */
+			mat.translate(cam.centerMover.target).get(fb);
+			glLoadMatrixf(fb);
+			renderCube();
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
