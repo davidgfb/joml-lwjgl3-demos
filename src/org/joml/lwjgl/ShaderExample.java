@@ -1,9 +1,9 @@
 package org.joml.lwjgl;
 
 import org.joml.Matrix4f;
+import org.joml.Quaternion;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.*;
-import org.lwjgl.opengl.*;
+import org.lwjgl.glfw.*;import org.lwjgl.opengl.GLContext;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -42,7 +42,7 @@ public class ShaderExample {
 
     void init() {
         glfwSetErrorCallback(errorCallback = errorCallbackPrint(System.err));
-        if (glfwInit() != GL11.GL_TRUE)
+        if (glfwInit() != GL_TRUE)
             throw new IllegalStateException("Unable to initialize GLFW");
 
         glfwDefaultWindowHints();
@@ -156,12 +156,15 @@ public class ShaderExample {
 
         // Obtain uniform location
         int matLocation = glGetUniformLocation(program, "viewProjMatrix");
-        long firstTime = System.nanoTime();
+        long lastTime = System.nanoTime();
+
+        /* Quaternion to rotate the cube */
+        Quaternion q = new Quaternion();
 
         while (glfwWindowShouldClose(window) == GL_FALSE) {
             long thisTime = System.nanoTime();
-            float diff = (thisTime - firstTime) / 1E9f;
-            float angle = diff * 20.0f;
+            float dt = (thisTime - lastTime) / 1E9f;
+            lastTime = thisTime;
 
             glViewport(0, 0, width, height);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -175,8 +178,11 @@ public class ShaderExample {
             // Render the grid without rotating
             renderGrid();
 
-            // Build a rotation for the cube
-            viewProjMatrix.rotate(angle, 0.0f, 1.0f, 0.0f).translate(0.0f, 0.5f, 0.0f).get(fb);
+            // Translate the cube 0.5 in y and
+            // rotate it (1 radians per second)
+            viewProjMatrix.rotate(q.integrate(0, 1, 0, dt))
+                          .translate(0.0f, 0.5f, 0.0f)
+                          .get(fb);
             // Upload the matrix
             glUniformMatrix4fv(matLocation, false, fb);
             // Render cube
