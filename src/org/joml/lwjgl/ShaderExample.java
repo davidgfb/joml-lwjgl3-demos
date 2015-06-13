@@ -188,7 +188,7 @@ public class ShaderExample {
 
     void loop() {
         /*
-         * Spawn a new thread which creates the OpenGL context and does the
+         * Spawn a new thread which to make the OpenGL context current in and which does the
          * rendering.
          */
         Thread t = new Thread(new Runnable() {
