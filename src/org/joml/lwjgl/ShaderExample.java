@@ -179,7 +179,7 @@ public class ShaderExample {
 
             // Translate the cube 0.5 in y and
             // rotate it (1 radians per second)
-            viewProjMatrix.rotate(q.integrate(0, 2, 0, dt))
+            viewProjMatrix.rotate(q.integrate(0, 1, 0, dt))
                           .translate(0.0f, 0.5f, 0.0f)
                           .get(fb);
             // Upload the matrix
