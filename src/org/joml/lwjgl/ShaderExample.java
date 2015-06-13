@@ -136,41 +136,6 @@ public class ShaderExample {
 		glEnd();
 	}
 
-	long firstTime = System.nanoTime();
-	int matLocation;
-	boolean ready;
-
-	void render() {
-		if (!ready) {
-			return;
-		}
-
-		long thisTime = System.nanoTime();
-		float diff = (thisTime - firstTime) / 1E9f;
-		float angle = diff * 20.0f;
-
-		glViewport(0, 0, width, height);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		// Create a view-projection matrix
-		viewProjMatrix.setPerspective(45.0f, (float) width / height, 0.01f, 100.0f)
-				.lookAt(0.0f, 2.0f, 3.0f, 0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f).get(fb);
-		// Upload the matrix stored in the FloatBuffer to the
-		// shader uniform.
-		glUniformMatrix4fv(matLocation, false, fb);
-		// Render the grid without rotating
-		renderGrid();
-
-		// Build a rotation for the cube
-		viewProjMatrix.rotate(angle, 0.0f, 1.0f, 0.0f).translate(0.0f, 0.5f, 0.0f).get(fb);
-		// Upload the matrix
-		glUniformMatrix4fv(matLocation, false, fb);
-		// Render cube
-		renderCube();
-
-		glfwSwapBuffers(window);
-	}
-	
 	void initOpenGLAndRenderInAnotherThread() {
 		glfwMakeContextCurrent(window);
 		glfwSwapInterval(0);
@@ -195,12 +160,34 @@ public class ShaderExample {
 		glUseProgram(program);
 
 		// Obtain uniform location
-		matLocation = glGetUniformLocation(program, "viewProjMatrix");
-
-		ready = true;
+		int matLocation = glGetUniformLocation(program, "viewProjMatrix");
+		long firstTime = System.nanoTime();
 
 		while (glfwWindowShouldClose(window) == GL_FALSE) {
-			render();
+			long thisTime = System.nanoTime();
+			float diff = (thisTime - firstTime) / 1E9f;
+			float angle = diff * 20.0f;
+
+			glViewport(0, 0, width, height);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			// Create a view-projection matrix
+			viewProjMatrix.setPerspective(45.0f, (float) width / height, 0.01f, 100.0f)
+					.lookAt(0.0f, 2.0f, 3.0f, 0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f).get(fb);
+			// Upload the matrix stored in the FloatBuffer to the
+			// shader uniform.
+			glUniformMatrix4fv(matLocation, false, fb);
+			// Render the grid without rotating
+			renderGrid();
+
+			// Build a rotation for the cube
+			viewProjMatrix.rotate(angle, 0.0f, 1.0f, 0.0f).translate(0.0f, 0.5f, 0.0f).get(fb);
+			// Upload the matrix
+			glUniformMatrix4fv(matLocation, false, fb);
+			// Render cube
+			renderCube();
+
+			glfwSwapBuffers(window);
 		}
 	}
 
