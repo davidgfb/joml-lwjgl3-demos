@@ -90,22 +90,27 @@ public class ShaderExample {
         glVertex3f(  0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f, -0.5f, -0.5f );
+        
         glVertex3f(  0.5f, -0.5f,  0.5f );
         glVertex3f(  0.5f,  0.5f,  0.5f );
         glVertex3f( -0.5f,  0.5f,  0.5f );
         glVertex3f( -0.5f, -0.5f,  0.5f );
+        
         glVertex3f(  0.5f, -0.5f, -0.5f );
         glVertex3f(  0.5f,  0.5f, -0.5f );
         glVertex3f(  0.5f,  0.5f,  0.5f );
         glVertex3f(  0.5f, -0.5f,  0.5f );
+        
         glVertex3f( -0.5f, -0.5f,  0.5f );
         glVertex3f( -0.5f,  0.5f,  0.5f );
         glVertex3f( -0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f, -0.5f, -0.5f );
+        
         glVertex3f(  0.5f,  0.5f,  0.5f );
         glVertex3f(  0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f,  0.5f,  0.5f );
+        
         glVertex3f(  0.5f, -0.5f, -0.5f );
         glVertex3f(  0.5f, -0.5f,  0.5f );
         glVertex3f( -0.5f, -0.5f,  0.5f );
@@ -144,9 +149,10 @@ public class ShaderExample {
         glCompileShader(vs);
         glAttachShader(program, vs);
         int fs = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs, 
+        glShaderSource(fs,
+                "uniform vec3 color;" +
                 "void main(void) {" + 
-                "  gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);" + 
+                "  gl_FragColor = vec4(color, 1.0);" + 
                 "}");
         glCompileShader(fs);
         glAttachShader(program, fs);
@@ -155,6 +161,7 @@ public class ShaderExample {
 
         // Obtain uniform location
         int matLocation = glGetUniformLocation(program, "viewProjMatrix");
+        int colorLocation = glGetUniformLocation(program, "color");
         long lastTime = System.nanoTime();
 
         /* Quaternion to rotate the cube */
@@ -190,8 +197,17 @@ public class ShaderExample {
                           .get(fb);
             // Upload the matrix
             glUniformMatrix4fv(matLocation, false, fb);
-            // Render cube
+
+            // Render solid cube with outlines
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glUniform3f(colorLocation, 0.6f, 0.7f, 0.8f);
             renderCube();
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glEnable(GL_POLYGON_OFFSET_LINE);
+            glPolygonOffset(-1.f,-1.f);
+            glUniform3f(colorLocation, 0.0f, 0.0f, 0.0f);
+            renderCube();
+            glDisable(GL_POLYGON_OFFSET_LINE);
 
             synchronized (lock) {
                 if (!destroyed) {
