@@ -65,6 +65,7 @@ public class ArcBallCameraDemo {
 		glfwDefaultWindowHints();
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+		glfwWindowHint(GLFW_SAMPLES, 4);
 
 		int WIDTH = 800;
 		int HEIGHT = 600;
@@ -185,6 +186,7 @@ public class ArcBallCameraDemo {
 		glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
 		// Enable depth testing
 		glEnable(GL_DEPTH_TEST);
+		glLineWidth(1.4f);
 
 		// Remember the current time.
 		long lastTime = System.nanoTime();
@@ -193,19 +195,17 @@ public class ArcBallCameraDemo {
 		// FloatBuffer for transferring matrices to OpenGL
 		FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 
-		float alpha = -20.0f;
-		float beta = 20.0f;
+		cam.setAlpha(-20.0f);
+		cam.setBeta(20.0f);
 
 		while (glfwWindowShouldClose(window) == GL_FALSE) {
 			/* Set input values for the camera */
 			if (down) {
-				alpha += (x - mouseX) * 0.1f;
-				beta += (mouseY - y) * 0.1f;
+				cam.setAlpha(cam.getAlpha() + (x - mouseX) * 0.1f);
+				cam.setBeta(cam.getBeta() + (mouseY - y) * 0.1f);
 				mouseX = x;
 				mouseY = y;
 			}
-			cam.alpha(alpha);
-			cam.beta(beta);
 			cam.zoom(zoom);
 
 			/* Compute delta time */
