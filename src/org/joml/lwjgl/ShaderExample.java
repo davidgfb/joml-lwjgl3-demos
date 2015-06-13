@@ -22,6 +22,8 @@ public class ShaderExample {
     long window;
     int width;
     int height;
+    Object lock = new Object();
+    boolean destroyed;
 
     Matrix4f viewProjMatrix = new Matrix4f();
     FloatBuffer fb = BufferUtils.createFloatBuffer(16);
@@ -31,7 +33,10 @@ public class ShaderExample {
             init();
             loop();
 
-            glfwDestroyWindow(window);
+            synchronized (lock) {
+                destroyed = true;
+                glfwDestroyWindow(window);
+            }
             keyCallback.release();
             fbCallback.release();
         } finally {
@@ -81,36 +86,30 @@ public class ShaderExample {
 
     void renderCube() {
         glBegin(GL_QUADS);
-        glColor3f(1.0f, 1.0f, 0.0f);
-        glVertex3f(0.5f, -0.5f, -0.5f);
-        glVertex3f(0.5f, 0.5f, -0.5f);
-        glVertex3f(-0.5f, 0.5f, -0.5f);
-        glVertex3f(-0.5f, -0.5f, -0.5f);
-        glColor3f(0.0f, 1.0f, 1.0f);
-        glVertex3f(0.5f, -0.5f, 0.5f);
-        glVertex3f(0.5f, 0.5f, 0.5f);
-        glVertex3f(-0.5f, 0.5f, 0.5f);
-        glVertex3f(-0.5f, -0.5f, 0.5f);
-        glColor3f(1.0f, 0.0f, 1.0f);
-        glVertex3f(0.5f, -0.5f, -0.5f);
-        glVertex3f(0.5f, 0.5f, -0.5f);
-        glVertex3f(0.5f, 0.5f, 0.5f);
-        glVertex3f(0.5f, -0.5f, 0.5f);
-        glColor3f(0.0f, 1.0f, 0.0f);
-        glVertex3f(-0.5f, -0.5f, 0.5f);
-        glVertex3f(-0.5f, 0.5f, 0.5f);
-        glVertex3f(-0.5f, 0.5f, -0.5f);
-        glVertex3f(-0.5f, -0.5f, -0.5f);
-        glColor3f(0.0f, 0.0f, 1.0f);
-        glVertex3f(0.5f, 0.5f, 0.5f);
-        glVertex3f(0.5f, 0.5f, -0.5f);
-        glVertex3f(-0.5f, 0.5f, -0.5f);
-        glVertex3f(-0.5f, 0.5f, 0.5f);
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glVertex3f(0.5f, -0.5f, -0.5f);
-        glVertex3f(0.5f, -0.5f, 0.5f);
-        glVertex3f(-0.5f, -0.5f, 0.5f);
-        glVertex3f(-0.5f, -0.5f, -0.5f);
+        glVertex3f(  0.5f, -0.5f, -0.5f );
+        glVertex3f(  0.5f,  0.5f, -0.5f );
+        glVertex3f( -0.5f,  0.5f, -0.5f );
+        glVertex3f( -0.5f, -0.5f, -0.5f );
+        glVertex3f(  0.5f, -0.5f,  0.5f );
+        glVertex3f(  0.5f,  0.5f,  0.5f );
+        glVertex3f( -0.5f,  0.5f,  0.5f );
+        glVertex3f( -0.5f, -0.5f,  0.5f );
+        glVertex3f(  0.5f, -0.5f, -0.5f );
+        glVertex3f(  0.5f,  0.5f, -0.5f );
+        glVertex3f(  0.5f,  0.5f,  0.5f );
+        glVertex3f(  0.5f, -0.5f,  0.5f );
+        glVertex3f( -0.5f, -0.5f,  0.5f );
+        glVertex3f( -0.5f,  0.5f,  0.5f );
+        glVertex3f( -0.5f,  0.5f, -0.5f );
+        glVertex3f( -0.5f, -0.5f, -0.5f );
+        glVertex3f(  0.5f,  0.5f,  0.5f );
+        glVertex3f(  0.5f,  0.5f, -0.5f );
+        glVertex3f( -0.5f,  0.5f, -0.5f );
+        glVertex3f( -0.5f,  0.5f,  0.5f );
+        glVertex3f(  0.5f, -0.5f, -0.5f );
+        glVertex3f(  0.5f, -0.5f,  0.5f );
+        glVertex3f( -0.5f, -0.5f,  0.5f );
+        glVertex3f( -0.5f, -0.5f, -0.5f );
         glEnd();
     }
 
@@ -118,9 +117,9 @@ public class ShaderExample {
         glBegin(GL_LINES);
         for (int i = -20; i < 20; i++) {
             glVertex3f(-20.0f, 0.0f, i);
-            glVertex3f(20.0f, 0.0f, i);
+            glVertex3f( 20.0f, 0.0f, i);
             glVertex3f(i, 0.0f, -20.0f);
-            glVertex3f(i, 0.0f, 20.0f);
+            glVertex3f(i, 0.0f,  20.0f);
         }
         glEnd();
     }
@@ -161,7 +160,7 @@ public class ShaderExample {
         /* Quaternion to rotate the cube */
         Quaternion q = new Quaternion();
 
-        while (glfwWindowShouldClose(window) == GL_FALSE) {
+        while (!destroyed) {
             long thisTime = System.nanoTime();
             float dt = (thisTime - lastTime) / 1E9f;
             lastTime = thisTime;
@@ -180,7 +179,7 @@ public class ShaderExample {
 
             // Translate the cube 0.5 in y and
             // rotate it (1 radians per second)
-            viewProjMatrix.rotate(q.integrate(0, 1, 0, dt))
+            viewProjMatrix.rotate(q.integrate(0, 2, 0, dt))
                           .translate(0.0f, 0.5f, 0.0f)
                           .get(fb);
             // Upload the matrix
@@ -188,7 +187,11 @@ public class ShaderExample {
             // Render cube
             renderCube();
 
-            glfwSwapBuffers(window);
+            synchronized (lock) {
+                if (!destroyed) {
+                    glfwSwapBuffers(window);
+                }
+            }
         }
     }
 
@@ -197,12 +200,11 @@ public class ShaderExample {
          * Spawn a new thread which to make the OpenGL context current in and which does the
          * rendering.
          */
-        Thread t = new Thread(new Runnable() {
+        new Thread(new Runnable() {
             public void run() {
                 initOpenGLAndRenderInAnotherThread();
             }
-        });
-        t.start();
+        }).start();
 
         /* Process window messages in the main thread */
         while (glfwWindowShouldClose(window) == GL_FALSE) {
