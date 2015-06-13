@@ -159,6 +159,8 @@ public class ShaderExample {
 
         /* Quaternion to rotate the cube */
         Quaternion q = new Quaternion();
+        /* Alternative to the quaternion. See below. */
+        Matrix4f m = new Matrix4f();
 
         while (!destroyed) {
             long thisTime = System.nanoTime();
@@ -183,6 +185,7 @@ public class ShaderExample {
             // rotate the cube (45 degrees per second)
             // and translate it by 0.5 in y
             viewProjMatrix.translate(0.0f, 0.5f, 0.0f)
+                        //.mul(m.rotateY(45 * dt)) <- can alternatively be used
                           .rotate(q.rotateY(45 * dt))
                           .get(fb);
             // Upload the matrix
