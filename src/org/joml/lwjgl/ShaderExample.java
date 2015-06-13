@@ -18,15 +18,10 @@ public class ShaderExample {
 	GLFWErrorCallback errorCallback;
 	GLFWKeyCallback keyCallback;
 	GLFWFramebufferSizeCallback fbCallback;
-	GLFWWindowRefreshCallback wrCallback;
-	GLFWWindowSizeCallback wsCallback;
-	GLFWCursorPosCallback cpCallback;
 
 	long window;
 	int width;
 	int height;
-	int x;
-	int y;
 
 	Matrix4f viewProjMatrix = new Matrix4f();
 	FloatBuffer fb = BufferUtils.createFloatBuffer(16);
@@ -38,6 +33,7 @@ public class ShaderExample {
 
 			glfwDestroyWindow(window);
 			keyCallback.release();
+			fbCallback.release();
 		} finally {
 			glfwTerminate();
 			errorCallback.release();
@@ -65,13 +61,6 @@ public class ShaderExample {
 			public void invoke(long window, int key, int scancode, int action, int mods) {
 				if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
 					glfwSetWindowShouldClose(window, GL_TRUE);
-			}
-		});
-		glfwSetCursorPosCallback(window, cpCallback = new GLFWCursorPosCallback() {
-			@Override
-			public void invoke(long window, double wx, double wy) {
-				x = (int) wx;
-				y = (int) wy;
 			}
 		});
 		glfwSetFramebufferSizeCallback(window, fbCallback = new GLFWFramebufferSizeCallback() {
