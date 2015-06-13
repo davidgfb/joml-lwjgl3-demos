@@ -170,17 +170,20 @@ public class ShaderExample {
 
             // Create a view-projection matrix
             viewProjMatrix.setPerspective(45.0f, (float) width / height, 0.01f, 100.0f)
-                    .lookAt(0.0f, 2.0f, 3.0f, 0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f).get(fb);
+                          .lookAt(0.0f, 2.0f, 3.0f,
+                                  0.0f, 0.5f, 0.0f,
+                                  0.0f, 1.0f, 0.0f)
+                          .get(fb);
             // Upload the matrix stored in the FloatBuffer to the
             // shader uniform.
             glUniformMatrix4fv(matLocation, false, fb);
             // Render the grid without rotating
             renderGrid();
 
-            // Translate the cube 0.5 in y and
-            // rotate it (1 radians per second)
-            viewProjMatrix.rotate(q.integrate(0, 1, 0, dt))
-                          .translate(0.0f, 0.5f, 0.0f)
+            // rotate the cube (45 degrees per second)
+            // and translate the it 0.5 in y
+            viewProjMatrix.translate(0.0f, 0.5f, 0.0f)
+                          .rotate(q.integrate(0, 45, 0, dt))
                           .get(fb);
             // Upload the matrix
             glUniformMatrix4fv(matLocation, false, fb);

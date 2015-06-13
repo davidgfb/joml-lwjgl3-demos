@@ -152,7 +152,8 @@ public class LwjglDemo {
             // Make sure to cast them to float before dividing, or
             // else we would do an integer division!
             projMatrix.setPerspective(45.0f, (float)width/height,
-                                      0.01f, 100.0f).get(fb);
+                                      0.01f, 100.0f)
+                       .get(fb);
             glMatrixMode(GL_PROJECTION);
             glLoadMatrixf(fb);
 
@@ -164,7 +165,8 @@ public class LwjglDemo {
             viewMatrix.setLookAt(0.0f, 1.0f, 2.0f,
                                  0.0f, 0.0f, 0.0f,
                                  0.0f, 1.0f, 0.0f)
-                      .rotate(angle, 0.0f, 1.0f, 0.0f).get(fb);
+                      .rotate(angle, 0.0f, 1.0f, 0.0f)
+                      .get(fb);
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixf(fb);
 
