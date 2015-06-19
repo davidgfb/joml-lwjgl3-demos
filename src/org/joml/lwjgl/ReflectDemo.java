@@ -78,6 +78,7 @@ public class ReflectDemo {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+        glfwWindowHint(GLFW_SAMPLES, 4);
 
         window = glfwCreateWindow(width, height, "Hello ArcBall Camera!", NULL, NULL);
         if (window == NULL)
@@ -222,9 +223,8 @@ public class ReflectDemo {
         Vector3f mirrorPosition = new Vector3f(0.0f, 3.0f, -3.0f);
         Vector3f mirrorNormal = new Vector3f(0.0f, -1.0f, 5.0f);
         mirrorMatrix.translate(mirrorPosition)
-                    .rotate(new Quaternion().lookRotate(mirrorNormal.x, mirrorNormal.y, mirrorNormal.z,
-                                                        0.0f, 1.0f, 0.0f).invert())
-                    .scale(5.0f);
+                    .rotate(new Quaternion().lookRotate(mirrorNormal, new Vector3f(0.0f, 1.0f, 0.0f)).invert())
+                    .scale(15.0f, 3.0f, 1.0f);
 
         /* Build the reflection matrix */
         Matrix4f reflectMatrix = new Matrix4f();
