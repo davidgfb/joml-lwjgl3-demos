@@ -228,8 +228,7 @@ public class ReflectDemo {
 
         /* Build the reflection matrix */
         Matrix4f reflectMatrix = new Matrix4f();
-        reflectMatrix.reflect(mirrorNormal.x, mirrorNormal.y, mirrorNormal.z, 
-                              mirrorPosition.x, mirrorPosition.y, mirrorPosition.z);
+        reflectMatrix.reflect(mirrorNormal, mirrorPosition);
 
         while (glfwWindowShouldClose(window) == GL_FALSE) {
             /* Set input values for the camera */
