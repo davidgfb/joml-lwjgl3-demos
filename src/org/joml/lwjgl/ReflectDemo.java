@@ -219,7 +219,7 @@ public class ReflectDemo {
         cam.setBeta(20.0f);
 
         Vector3f mirrorPosition = new Vector3f(0.0f, 3.0f, -5.0f);
-        /* Build orientation quaternion of mirror. It should look along the mirror normal. */        
+        /* Build orientation quaternion of mirror. */        
         Quaternion mirrorOrientation = new Quaternion();
         mirrorOrientation.rotateY(45)
                          .rotateX(45);
