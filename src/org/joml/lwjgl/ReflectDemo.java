@@ -222,13 +222,8 @@ public class ReflectDemo {
         Matrix4f mirrorMatrix = new Matrix4f();
         Vector3f mirrorPosition = new Vector3f(0.0f, 3.0f, -3.0f);
         Vector3f mirrorNormal = new Vector3f(0.0f, -1.0f, 5.0f);
-        mirrorMatrix.translate(mirrorPosition)
-                    .rotate(new Quaternion().lookRotate(mirrorNormal, new Vector3f(0.0f, 1.0f, 0.0f)).invert())
-                    .scale(15.0f, 3.0f, 1.0f);
-
-        /* Build the reflection matrix */
+        Quaternion mirrorOrientation = new Quaternion().lookRotate(mirrorNormal, new Vector3f(0.0f, 1.0f, 0.0f)).invert();
         Matrix4f reflectMatrix = new Matrix4f();
-        reflectMatrix.reflect(mirrorNormal, mirrorPosition);
 
         while (glfwWindowShouldClose(window) == GL_FALSE) {
             /* Set input values for the camera */
@@ -262,9 +257,12 @@ public class ReflectDemo {
             glLoadMatrixf(fb);
 
             /* Stencil the mirror */
-            glPushMatrix();
-            mirrorMatrix.get(fb);
-            glMultMatrixf(fb);
+            mirrorMatrix.set(mat)
+                        .translate(mirrorPosition)
+                        .rotate(mirrorOrientation)
+                        .scale(15.0f, 3.0f, 1.0f)
+                        .get(fb);
+            glLoadMatrixf(fb);
             glEnable(GL_STENCIL_TEST);
             glColorMask(false, false, false, false);
             glDisable(GL_DEPTH_TEST);
@@ -277,31 +275,30 @@ public class ReflectDemo {
             glEnable(GL_DEPTH_TEST);
             glStencilFunc(GL_EQUAL, 1, 1);
             glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-            glPopMatrix();
 
             /* Render the reflected scene */
-            glPushMatrix();
-            reflectMatrix.get(fb);
-            glMultMatrixf(fb);
+            reflectMatrix.set(mat)
+                         .reflect(mirrorNormal, mirrorPosition)
+                         .get(fb);
+            glLoadMatrixf(fb);
             renderGrid();
             renderCube();
-            glPopMatrix();
             glDisable(GL_STENCIL_TEST);
 
             /* Render scene normally */
+            mat.get(fb);
+            glLoadMatrixf(fb);
             renderGrid();
             renderCube();
 
             /* Render visible mirror geometry with blending */
-            glPushMatrix();
             mirrorMatrix.get(fb);
-            glMultMatrixf(fb);
+            glLoadMatrixf(fb);
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             glColor4f(1, 1, 1, 0.5f);
             renderMirror();
             glDisable(GL_BLEND);
-            glPopMatrix();
 
             glfwSwapBuffers(window);
             glfwPollEvents();
