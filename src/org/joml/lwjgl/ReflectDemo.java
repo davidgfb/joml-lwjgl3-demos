@@ -288,12 +288,6 @@ public class ReflectDemo {
             renderCube();
             glDisable(GL_STENCIL_TEST);
 
-            /* Render scene normally */
-            mat.get(fb);
-            glLoadMatrixf(fb);
-            renderGrid();
-            renderCube();
-
             /* Render visible mirror geometry with blending */
             mirrorMatrix.get(fb);
             glLoadMatrixf(fb);
@@ -302,6 +296,12 @@ public class ReflectDemo {
             glColor4f(1, 1, 1, 0.5f);
             renderMirror();
             glDisable(GL_BLEND);
+
+            /* Render scene normally */
+            mat.get(fb);
+            glLoadMatrixf(fb);
+            renderGrid();
+            renderCube();
 
             glfwSwapBuffers(window);
             glfwPollEvents();
