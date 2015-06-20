@@ -218,10 +218,11 @@ public class ReflectDemo {
         cam.setAlpha(-20.0f);
         cam.setBeta(20.0f);
 
-        Vector3f mirrorPosition = new Vector3f(0.0f, 3.0f, -3.0f);
-        Vector3f mirrorNormal = new Vector3f(0.0f, -1.0f, 5.0f);
+        Vector3f mirrorPosition = new Vector3f(0.0f, 3.0f, -5.0f);
         /* Build orientation quaternion of mirror. It should look along the mirror normal. */        
-        Quaternion mirrorOrientation = new Quaternion().lookRotate(mirrorNormal, new Vector3f(0.0f, 1.0f, 0.0f)).invert();
+        Quaternion mirrorOrientation = new Quaternion();
+        mirrorOrientation.rotateY(45)
+                         .rotateX(45);
 
         /* Used to hold the mirror transformation matrix */
         Matrix4f mirrorMatrix = new Matrix4f();
@@ -263,7 +264,7 @@ public class ReflectDemo {
             mirrorMatrix.set(mat)
                         .translate(mirrorPosition)
                         .rotate(mirrorOrientation)
-                        .scale(15.0f, 3.0f, 1.0f)
+                        .scale(15.0f, 8.5f, 1.0f)
                         .get(fb);
             glLoadMatrixf(fb);
             glEnable(GL_STENCIL_TEST);
