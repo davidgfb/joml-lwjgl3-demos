@@ -218,11 +218,14 @@ public class ReflectDemo {
         cam.setAlpha(-20.0f);
         cam.setBeta(20.0f);
 
-        /* Build the transformation of the mirror object */
-        Matrix4f mirrorMatrix = new Matrix4f();
         Vector3f mirrorPosition = new Vector3f(0.0f, 3.0f, -3.0f);
         Vector3f mirrorNormal = new Vector3f(0.0f, -1.0f, 5.0f);
+        /* Build orientation quaternion of mirror. It should look along the mirror normal. */        
         Quaternion mirrorOrientation = new Quaternion().lookRotate(mirrorNormal, new Vector3f(0.0f, 1.0f, 0.0f)).invert();
+
+        /* Used to hold the mirror transformation matrix */
+        Matrix4f mirrorMatrix = new Matrix4f();
+        /* Used to hold the reflection matrix */
         Matrix4f reflectMatrix = new Matrix4f();
 
         while (glfwWindowShouldClose(window) == GL_FALSE) {
@@ -278,7 +281,7 @@ public class ReflectDemo {
 
             /* Render the reflected scene */
             reflectMatrix.set(mat)
-                         .reflect(mirrorNormal, mirrorPosition)
+                         .reflect(mirrorOrientation, mirrorPosition)
                          .get(fb);
             glLoadMatrixf(fb);
             renderGrid();
