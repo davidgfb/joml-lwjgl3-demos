@@ -53,6 +53,7 @@ public class ShaderExample {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+        glfwWindowHint(GLFW_SAMPLES, 8);
 
         int WIDTH = 300;
         int HEIGHT = 300;

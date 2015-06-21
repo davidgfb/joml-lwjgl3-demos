@@ -92,32 +92,32 @@ public class LwjglDemo {
 
     void renderCube() {
         glBegin(GL_QUADS);
-        glColor3f(   1.0f,  1.0f,  0.0f );
+        glColor3f(   0.0f,  0.0f,  0.2f );
         glVertex3f(  0.5f, -0.5f, -0.5f );
         glVertex3f(  0.5f,  0.5f, -0.5f );
-        glVertex3f( -0.5f,  0.5f, -0.5f );
-        glVertex3f( -0.5f, -0.5f, -0.5f );
-        glColor3f(   0.0f,  1.0f,  1.0f );
-        glVertex3f(  0.5f, -0.5f,  0.5f );
-        glVertex3f(  0.5f,  0.5f,  0.5f );
-        glVertex3f( -0.5f,  0.5f,  0.5f );
-        glVertex3f( -0.5f, -0.5f,  0.5f );
-        glColor3f(   1.0f,  0.0f,  1.0f );
-        glVertex3f(  0.5f, -0.5f, -0.5f );
-        glVertex3f(  0.5f,  0.5f, -0.5f );
-        glVertex3f(  0.5f,  0.5f,  0.5f );
-        glVertex3f(  0.5f, -0.5f,  0.5f );
-        glColor3f(   0.0f,  1.0f,  0.0f );
-        glVertex3f( -0.5f, -0.5f,  0.5f );
-        glVertex3f( -0.5f,  0.5f,  0.5f );
         glVertex3f( -0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f, -0.5f, -0.5f );
         glColor3f(   0.0f,  0.0f,  1.0f );
+        glVertex3f(  0.5f, -0.5f,  0.5f );
+        glVertex3f(  0.5f,  0.5f,  0.5f );
+        glVertex3f( -0.5f,  0.5f,  0.5f );
+        glVertex3f( -0.5f, -0.5f,  0.5f );
+        glColor3f(   1.0f,  0.0f,  0.0f );
+        glVertex3f(  0.5f, -0.5f, -0.5f );
+        glVertex3f(  0.5f,  0.5f, -0.5f );
+        glVertex3f(  0.5f,  0.5f,  0.5f );
+        glVertex3f(  0.5f, -0.5f,  0.5f );
+        glColor3f(   0.2f,  0.0f,  0.0f );
+        glVertex3f( -0.5f, -0.5f,  0.5f );
+        glVertex3f( -0.5f,  0.5f,  0.5f );
+        glVertex3f( -0.5f,  0.5f, -0.5f );
+        glVertex3f( -0.5f, -0.5f, -0.5f );
+        glColor3f(   0.0f,  1.0f,  0.0f );
         glVertex3f(  0.5f,  0.5f,  0.5f );
         glVertex3f(  0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f,  0.5f,  0.5f );
-        glColor3f(   1.0f,  0.0f,  0.0f );
+        glColor3f(   0.0f,  0.2f,  0.0f );
         glVertex3f(  0.5f, -0.5f, -0.5f );
         glVertex3f(  0.5f, -0.5f,  0.5f );
         glVertex3f( -0.5f, -0.5f,  0.5f );
@@ -165,7 +165,7 @@ public class LwjglDemo {
             viewMatrix.setLookAt(0.0f, 1.0f, 2.0f,
                                  0.0f, 0.0f, 0.0f,
                                  0.0f, 1.0f, 0.0f)
-                      .rotate(angle, 0.0f, 1.0f, 0.0f)
+                      .rotateY(angle)
                       .get(fb);
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixf(fb);
