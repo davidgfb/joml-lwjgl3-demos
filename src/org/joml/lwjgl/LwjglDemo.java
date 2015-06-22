@@ -157,8 +157,6 @@ public class LwjglDemo {
             glMatrixMode(GL_PROJECTION);
             glLoadMatrixf(fb);
 
-            projMatrix.toString();
-
             // Build a model-view matrix which first rotates the cube
             // about the Y-axis and then lets a "camera" look at that
             // cube from a certain distance.
@@ -169,8 +167,6 @@ public class LwjglDemo {
                       .get(fb);
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixf(fb);
-
-            viewMatrix.toString();
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
