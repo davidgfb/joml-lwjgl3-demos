@@ -80,7 +80,7 @@ public class ReflectDemo {
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
         glfwWindowHint(GLFW_SAMPLES, 4);
 
-        window = glfwCreateWindow(width, height, "Hello ArcBall Camera!", NULL, NULL);
+        window = glfwCreateWindow(width, height, "Reflection Demo", NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
