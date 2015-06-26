@@ -11,7 +11,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.joml.Matrix4f;
-import org.joml.Quaternion;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.camera.ArcBallCamera;
 import org.lwjgl.BufferUtils;
@@ -220,7 +220,7 @@ public class ReflectDemo {
 
         Vector3f mirrorPosition = new Vector3f(0.0f, 3.0f, -5.0f);
         /* Build orientation quaternion of mirror. */        
-        Quaternion mirrorOrientation = new Quaternion();
+        Quaternionf mirrorOrientation = new Quaternionf();
         mirrorOrientation.rotateY(45)
                          .rotateX(45);
 

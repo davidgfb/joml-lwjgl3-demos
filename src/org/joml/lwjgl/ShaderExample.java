@@ -1,7 +1,7 @@
 package org.joml.lwjgl;
 
 import org.joml.Matrix4f;
-import org.joml.Quaternion;
+import org.joml.Quaternionf;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;import org.lwjgl.opengl.GLContext;
 
@@ -166,7 +166,7 @@ public class ShaderExample {
         long lastTime = System.nanoTime();
 
         /* Quaternion to rotate the cube */
-        Quaternion q = new Quaternion();
+        Quaternionf q = new Quaternionf();
         /* Alternative to the quaternion. See below. */
         Matrix4f m = new Matrix4f();
 
