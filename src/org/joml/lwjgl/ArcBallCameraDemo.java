@@ -199,14 +199,14 @@ public class ArcBallCameraDemo {
         // FloatBuffer for transferring matrices to OpenGL
         FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 
-        cam.setAlpha(-20.0f);
-        cam.setBeta(20.0f);
+        cam.setAlpha((float) Math.toRadians(-20));
+        cam.setBeta((float) Math.toRadians(20));
 
         while (glfwWindowShouldClose(window) == GL_FALSE) {
             /* Set input values for the camera */
             if (down) {
-                cam.setAlpha(cam.getAlpha() + (x - mouseX) * 0.1f);
-                cam.setBeta(cam.getBeta() + (mouseY - y) * 0.1f);
+                cam.setAlpha(cam.getAlpha() + Math.toRadians((x - mouseX) * 0.1f));
+                cam.setBeta(cam.getBeta() + Math.toRadians((mouseY - y) * 0.1f));
                 mouseX = x;
                 mouseY = y;
             }
@@ -222,7 +222,7 @@ public class ArcBallCameraDemo {
             glViewport(0, 0, width, height);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            mat.setPerspective(45.0f, (float) width / height, 0.01f, 100.0f).get(fb);
+            mat.setPerspective((float) Math.toRadians(45), (float) width / height, 0.01f, 100.0f).get(fb);
             glMatrixMode(GL_PROJECTION);
             glLoadMatrixf(fb);
 

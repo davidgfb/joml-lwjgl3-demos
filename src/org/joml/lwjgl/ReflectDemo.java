@@ -215,8 +215,8 @@ public class ReflectDemo {
         // FloatBuffer for transferring matrices to OpenGL
         FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 
-        cam.setAlpha(-20.0f);
-        cam.setBeta(20.0f);
+        cam.setAlpha((float) Math.toRadians(-20));
+        cam.setBeta((float) Math.toRadians(20));
 
         Vector3f mirrorPosition = new Vector3f(0.0f, 3.0f, -5.0f);
         /* Build orientation quaternion of mirror. */        
@@ -232,8 +232,8 @@ public class ReflectDemo {
         while (glfwWindowShouldClose(window) == GL_FALSE) {
             /* Set input values for the camera */
             if (down) {
-                cam.setAlpha(cam.getAlpha() + (x - mouseX) * 0.1f);
-                cam.setBeta(cam.getBeta() + (mouseY - y) * 0.1f);
+                cam.setAlpha(cam.getAlpha() + Math.toRadians((x - mouseX) * 0.1f));
+                cam.setBeta(cam.getBeta() + Math.toRadians((mouseY - y) * 0.1f));
                 mouseX = x;
                 mouseY = y;
             }
