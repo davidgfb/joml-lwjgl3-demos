@@ -167,8 +167,6 @@ public class ShaderExample {
 
         /* Quaternion to rotate the cube */
         Quaternionf q = new Quaternionf();
-        /* Alternative to the quaternion. See below. */
-        Matrix4f m = new Matrix4f();
 
         while (!destroyed) {
             long thisTime = System.nanoTime();
@@ -179,7 +177,7 @@ public class ShaderExample {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // Create a view-projection matrix
-            viewProjMatrix.setPerspective(45.0f, (float) width / height, 0.01f, 100.0f)
+            viewProjMatrix.setPerspective((float) Math.toRadians(45.0f), (float) width / height, 0.01f, 100.0f)
                           .lookAt(0.0f, 2.0f, 3.0f,
                                   0.0f, 0.5f, 0.0f,
                                   0.0f, 1.0f, 0.0f)
@@ -193,8 +191,7 @@ public class ShaderExample {
             // rotate the cube (45 degrees per second)
             // and translate it by 0.5 in y
             viewProjMatrix.translate(0.0f, 0.5f, 0.0f)
-                        //.mul(m.rotateY(45 * dt)) <- can alternatively be used
-                          .rotate(q.rotateY(45 * dt))
+                          .rotate(q.rotateY((float) Math.toRadians(45) * dt))
                           .get(fb);
             // Upload the matrix
             glUniformMatrix4fv(matLocation, false, fb);

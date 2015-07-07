@@ -151,7 +151,7 @@ public class LwjglDemo {
             // aspect ratio based on window width and height.
             // Make sure to cast them to float before dividing, or
             // else we would do an integer division!
-            projMatrix.setPerspective(45.0f, (float)width/height,
+            projMatrix.setPerspective((float) Math.toRadians(45.0f), (float)width/height,
                                       0.01f, 100.0f)
                        .get(fb);
             glMatrixMode(GL_PROJECTION);
