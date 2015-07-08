@@ -221,8 +221,8 @@ public class ReflectDemo {
         Vector3f mirrorPosition = new Vector3f(0.0f, 3.0f, -5.0f);
         /* Build orientation quaternion of mirror. */        
         Quaternionf mirrorOrientation = new Quaternionf();
-        mirrorOrientation.rotateY(45)
-                         .rotateX(45);
+        mirrorOrientation.rotateY((float) Math.toRadians(45))
+                         .rotateX((float) Math.toRadians(45));
 
         /* Used to hold the mirror transformation matrix */
         Matrix4f mirrorMatrix = new Matrix4f();
