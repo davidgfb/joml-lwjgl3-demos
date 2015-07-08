@@ -141,7 +141,7 @@ public class LwjglDemo {
             long thisTime = System.nanoTime();
             float diff = (thisTime - firstTime) / 1E9f;
             // Compute some rotation angle.
-            float angle = diff * 20.0f;
+            float angle = diff;
 
             // Make the viewport always fill the whole window.
             glViewport(0, 0, width, height);
@@ -163,7 +163,8 @@ public class LwjglDemo {
             viewMatrix.setLookAt(0.0f, 1.0f, 2.0f,
                                  0.0f, 0.0f, 0.0f,
                                  0.0f, 1.0f, 0.0f)
-                      .rotateY(angle)
+                      // rotate 90 degrees per second
+                      .rotateY(angle * (float) Math.toRadians(90))
                       .get(fb);
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixf(fb);
