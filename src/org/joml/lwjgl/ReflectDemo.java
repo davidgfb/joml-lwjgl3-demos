@@ -27,8 +27,7 @@ import org.lwjgl.opengl.GLContext;
 
 /**
  * Showcases the use of
- * {@link Matrix4f#reflect(float, float, float, float, float, float)
- * Matrix4f.reflect()} with stencil reflections.
+ * {@link Matrix4f#reflect(Quaternionf, Vector3f) Matrix4f.reflect()} with stencil reflections.
  * <p>
  * This demo also makes use of joml-camera with the {@link ArcBallCamera}.
  * 
