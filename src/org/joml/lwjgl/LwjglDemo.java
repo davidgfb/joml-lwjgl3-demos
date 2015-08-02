@@ -126,7 +126,7 @@ public class LwjglDemo {
     }
 
     void loop() {
-        GLContext.createFromCurrent();
+        GL.createCapabilities();
 
         // Set the clear color
         glClearColor(0.6f, 0.7f, 0.8f, 1.0f);

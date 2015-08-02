@@ -15,15 +15,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.camera.ArcBallCamera;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.GLFWCursorPosCallback;
-import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
-import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.glfw.GLFWMouseButtonCallback;
-import org.lwjgl.glfw.GLFWScrollCallback;
-import org.lwjgl.glfw.GLFWvidmode;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GLContext;
+import org.lwjgl.glfw.*;
+import org.lwjgl.opengl.*;
 
 /**
  * Showcases the use of
@@ -199,7 +192,7 @@ public class ReflectDemo {
     }
 
     void loop() {
-        GLContext.createFromCurrent();
+        GL.createCapabilities();
 
         // Set the clear color
         glClearColor(0.9f, 0.9f, 0.9f, 1.0f);

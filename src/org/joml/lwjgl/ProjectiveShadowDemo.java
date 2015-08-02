@@ -148,7 +148,7 @@ public class ProjectiveShadowDemo {
     }
 
     void loop() {
-        GLContext.createFromCurrent();
+        GL.createCapabilities();
 
         glClearColor(0.6f, 0.7f, 0.8f, 1.0f);
         glEnable(GL_DEPTH_TEST);

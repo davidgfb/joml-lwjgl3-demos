@@ -3,7 +3,8 @@ package org.joml.lwjgl;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.*;import org.lwjgl.opengl.GLContext;
+import org.lwjgl.glfw.*;
+import org.lwjgl.opengl.GL;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -133,7 +134,7 @@ public class ShaderExample {
     void initOpenGLAndRenderInAnotherThread() {
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
-        GLContext.createFromCurrent();
+        GL.createCapabilities();
 
         glClearColor(0.6f, 0.7f, 0.8f, 1.0f);
         glEnable(GL_DEPTH_TEST);
