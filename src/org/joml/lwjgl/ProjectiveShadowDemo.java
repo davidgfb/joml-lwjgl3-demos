@@ -98,6 +98,14 @@ public class ProjectiveShadowDemo {
         glEnd();
     }
 
+    void renderLight() {
+        glPointSize(10.0f);
+        glBegin(GL_POINTS);
+        glColor3f(1.0f, 1.0f, 0.0f);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glEnd();
+    }
+
     void renderCube(boolean shadow) {
         glBegin(GL_QUADS);
         if (shadow) {
@@ -187,8 +195,13 @@ public class ProjectiveShadowDemo {
             glLoadMatrixf(fb);
             renderPlane();
 
+            // Render light bulb
+            m2.rotationY(angle).translate(2, 0.9f, 2).transform(lightPos.set(0, 0, 0, 1));
+            m.mul(m2, m2).with(m2).get(fb);
+            glLoadMatrixf(fb);
+            renderLight();
+
             // Render projected shadow of the cube
-            m2.rotationY(angle).transform(lightPos.set(2, 2, 2, 1));
             m.shadow(lightPos, planeTransform).get(fb);
             glLoadMatrixf(fb);
             glEnable(GL_POLYGON_OFFSET_FILL);
