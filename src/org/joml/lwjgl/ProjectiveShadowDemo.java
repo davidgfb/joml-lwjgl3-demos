@@ -1,7 +1,7 @@
 package org.joml.lwjgl;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -157,8 +157,8 @@ public class ProjectiveShadowDemo {
 
         Matrix4f m = new Matrix4f();
         Matrix4f m2 = new Matrix4f();
-        Matrix4f planeTransform = new Matrix4f().translate(0.0f, -2.0f, 0.0f).scale(10.0f);
-        Vector3f lightPos = new Vector3f();
+        Matrix4f planeTransform = new Matrix4f().translate(0.0f, -0.5f, 0.0f).scale(10.0f);
+        Vector4f lightPos = new Vector4f();
 
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
             long thisTime = System.nanoTime();
@@ -188,8 +188,8 @@ public class ProjectiveShadowDemo {
             renderPlane();
 
             // Render projected shadow of the cube
-            m2.rotationY(angle).transform(lightPos.set(2, 2, 2));
-            m.shadow(lightPos.x, lightPos.y, lightPos.z, 1.0f, 0.0f, 1.0f, 0.0f, 2.0f).get(fb);
+            m2.rotationY(angle).transform(lightPos.set(2, 2, 2, 1));
+            m.shadow(lightPos, planeTransform).get(fb);
             glLoadMatrixf(fb);
             glEnable(GL_POLYGON_OFFSET_FILL);
             // use polygon offset to combat z-fighting between plane and projected shadow
