@@ -160,6 +160,7 @@ public class ProjectiveShadowDemo {
 
         glClearColor(0.6f, 0.7f, 0.8f, 1.0f);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
 
         long firstTime = System.nanoTime();
 
@@ -168,13 +169,16 @@ public class ProjectiveShadowDemo {
         Matrix4f planeTransform = new Matrix4f().translate(0.0f, -0.5f, 0.0f).scale(10.0f);
         Vector4f lightPos = new Vector4f();
 
+        // when we write stencil, we always replace the current value
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
             long thisTime = System.nanoTime();
             float diff = (thisTime - firstTime) / 1E9f;
             float angle = diff;
 
             glViewport(0, 0, width, height);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
             m.setPerspective((float) Math.toRadians(45.0f), (float)width/height,
                              0.01f, 100.0f).get(fb);
@@ -188,6 +192,10 @@ public class ProjectiveShadowDemo {
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixf(fb);
 
+            // always write stencil = 1
+            glStencilFunc(GL_ALWAYS, 1, 1);
+
+            // render cube in the center
             renderCube(false);
 
             // Render the plane on which to project the shadow
@@ -196,7 +204,7 @@ public class ProjectiveShadowDemo {
             renderPlane();
 
             // Render light bulb
-            m2.rotationY(angle).translate(2, 0.9f, 2).transform(lightPos.set(0, 0, 0, 1));
+            m2.rotationY(angle).translate(2, 0.8f, 2).transform(lightPos.set(0, 0, 0, 1));
             m.mul4x3(m2, m2).get(fb);
             glLoadMatrixf(fb);
             renderLight();
@@ -204,6 +212,8 @@ public class ProjectiveShadowDemo {
             // Render projected shadow of the cube
             m.shadow(lightPos, planeTransform).get(fb);
             glLoadMatrixf(fb);
+            // Draw only on the stenciled area
+            glStencilFunc(GL_EQUAL, 1, 1);
             glEnable(GL_POLYGON_OFFSET_FILL);
             // use polygon offset to combat z-fighting between plane and projected shadow
             glPolygonOffset(-1.f,-1.f);
