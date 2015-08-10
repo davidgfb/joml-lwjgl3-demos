@@ -178,8 +178,9 @@ public class ShaderExample {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // Create a view-projection matrix
-            viewProjMatrix.setPerspective((float) Math.toRadians(45.0f), (float) width / height, 0.01f, 100.0f)
-                          .lookAt(0.0f, 2.0f, 3.0f,
+            viewProjMatrix.setPerspective((float) Math.atan((ViewSettings.screenHeight * height / ViewSettings.screenHeightPx) / ViewSettings.distanceToScreen),
+                                          (float) width / height, 0.01f, 100.0f)
+                          .lookAt(0.0f, 3.0f, 8.0f,
                                   0.0f, 0.5f, 0.0f,
                                   0.0f, 1.0f, 0.0f)
                           .get(fb);

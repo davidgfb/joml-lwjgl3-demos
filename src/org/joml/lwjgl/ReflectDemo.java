@@ -241,7 +241,8 @@ public class ReflectDemo {
             glViewport(0, 0, width, height);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-            mat.setPerspective((float) Math.toRadians(45.0f), (float) width / height, 0.01f, 100.0f).get(fb);
+            mat.setPerspective((float) Math.atan((ViewSettings.screenHeight * height / ViewSettings.screenHeightPx) / ViewSettings.distanceToScreen),
+                               (float) width / height, 0.01f, 100.0f).get(fb);
             glMatrixMode(GL_PROJECTION);
             glLoadMatrixf(fb);
 
