@@ -91,10 +91,10 @@ public class ProjectiveShadowDemo {
     void renderPlane() {
         glBegin(GL_QUADS);
         glColor3f(0.5f, 0.6f, 0.7f);
-        glVertex3f(-1.0f, 0.0f, -1.0f);
-        glVertex3f( 1.0f, 0.0f, -1.0f);
-        glVertex3f( 1.0f, 0.0f,  1.0f);
         glVertex3f(-1.0f, 0.0f,  1.0f);
+        glVertex3f( 1.0f, 0.0f,  1.0f);
+        glVertex3f( 1.0f, 0.0f, -1.0f);
+        glVertex3f(-1.0f, 0.0f, -1.0f);
         glEnd();
     }
 
@@ -114,9 +114,9 @@ public class ProjectiveShadowDemo {
             glColor3f(0.0f, 0.0f, 0.2f);
         }
         glVertex3f(  0.5f, -0.5f, -0.5f );
-        glVertex3f(  0.5f,  0.5f, -0.5f );
-        glVertex3f( -0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f, -0.5f, -0.5f );
+        glVertex3f( -0.5f,  0.5f, -0.5f );
+        glVertex3f(  0.5f,  0.5f, -0.5f );
         if (!shadow) {
             glColor3f(0.0f, 0.0f, 1.0f);
         }
@@ -161,6 +161,7 @@ public class ProjectiveShadowDemo {
         glClearColor(0.6f, 0.7f, 0.8f, 1.0f);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_STENCIL_TEST);
+        glEnable(GL_CULL_FACE);
 
         long firstTime = System.nanoTime();
 

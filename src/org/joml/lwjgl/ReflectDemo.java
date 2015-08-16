@@ -135,22 +135,32 @@ public class ReflectDemo {
         glfwShowWindow(window);
     }
 
-    void renderMirror() {
+    void renderMirror(boolean backside) {
         glBegin(GL_QUADS);
+        glColor4f(1, 1, 1, 0.5f);
         glVertex3f(-0.5f, -0.5f, 0.0f);
         glVertex3f(0.5f, -0.5f, 0.0f);
         glVertex3f(0.5f, 0.5f, 0.0f);
         glVertex3f(-0.5f, 0.5f, 0.0f);
         glEnd();
+        if (backside) {
+            glBegin(GL_QUADS);
+            glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
+            glVertex3f(-0.5f, -0.5f, 0.0f);
+            glVertex3f(-0.5f, 0.5f, 0.0f);
+            glVertex3f(0.5f, 0.5f, 0.0f);
+            glVertex3f(0.5f, -0.5f, 0.0f);
+            glEnd();
+        }
     }
 
     void renderCube() {
         glBegin(GL_QUADS);
         glColor3f(   0.0f,  0.0f,  0.2f );
         glVertex3f(  0.5f, -0.5f, -0.5f );
-        glVertex3f(  0.5f,  0.5f, -0.5f );
-        glVertex3f( -0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f, -0.5f, -0.5f );
+        glVertex3f( -0.5f,  0.5f, -0.5f );
+        glVertex3f(  0.5f,  0.5f, -0.5f );
         glColor3f(   0.0f,  0.0f,  1.0f );
         glVertex3f(  0.5f, -0.5f,  0.5f );
         glVertex3f(  0.5f,  0.5f,  0.5f );
@@ -198,6 +208,7 @@ public class ReflectDemo {
         glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
         // Enable depth testing
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
         glLineWidth(1.4f);
 
         // Remember the current time.
@@ -265,9 +276,7 @@ public class ReflectDemo {
             glDisable(GL_DEPTH_TEST);
             glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
             glStencilFunc(GL_ALWAYS, 1, 1);
-            glEnable(GL_CULL_FACE);
-            renderMirror();
-            glDisable(GL_CULL_FACE);
+            renderMirror(false);
             glColorMask(true, true, true, true);
             glEnable(GL_DEPTH_TEST);
             glStencilFunc(GL_EQUAL, 1, 1);
@@ -279,7 +288,9 @@ public class ReflectDemo {
                          .get(fb);
             glLoadMatrixf(fb);
             renderGrid();
+            glFrontFace(GL_CW);
             renderCube();
+            glFrontFace(GL_CCW);
             glDisable(GL_STENCIL_TEST);
 
             /* Render visible mirror geometry with blending */
@@ -287,8 +298,7 @@ public class ReflectDemo {
             glLoadMatrixf(fb);
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glColor4f(1, 1, 1, 0.5f);
-            renderMirror();
+            renderMirror(true);
             glDisable(GL_BLEND);
 
             /* Render scene normally */

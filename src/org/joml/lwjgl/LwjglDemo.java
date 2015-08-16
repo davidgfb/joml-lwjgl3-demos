@@ -94,9 +94,9 @@ public class LwjglDemo {
         glBegin(GL_QUADS);
         glColor3f(   0.0f,  0.0f,  0.2f );
         glVertex3f(  0.5f, -0.5f, -0.5f );
-        glVertex3f(  0.5f,  0.5f, -0.5f );
-        glVertex3f( -0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f, -0.5f, -0.5f );
+        glVertex3f( -0.5f,  0.5f, -0.5f );
+        glVertex3f(  0.5f,  0.5f, -0.5f );
         glColor3f(   0.0f,  0.0f,  1.0f );
         glVertex3f(  0.5f, -0.5f,  0.5f );
         glVertex3f(  0.5f,  0.5f,  0.5f );
@@ -132,6 +132,7 @@ public class LwjglDemo {
         glClearColor(0.6f, 0.7f, 0.8f, 1.0f);
         // Enable depth testing
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
 
         // Remember the current time.
         long firstTime = System.nanoTime();
@@ -160,7 +161,7 @@ public class LwjglDemo {
             // Build a model-view matrix which first rotates the cube
             // about the Y-axis and then lets a "camera" look at that
             // cube from a certain distance.
-            viewMatrix.setLookAt(0.0f, 1.0f, 2.0f,
+            viewMatrix.setLookAt(0.0f, 2.0f, 5.0f,
                                  0.0f, 0.0f, 0.0f,
                                  0.0f, 1.0f, 0.0f)
                       // rotate 90 degrees per second

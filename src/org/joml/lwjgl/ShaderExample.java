@@ -89,9 +89,9 @@ public class ShaderExample {
     void renderCube() {
         glBegin(GL_QUADS);
         glVertex3f(  0.5f, -0.5f, -0.5f );
-        glVertex3f(  0.5f,  0.5f, -0.5f );
-        glVertex3f( -0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f, -0.5f, -0.5f );
+        glVertex3f( -0.5f,  0.5f, -0.5f );
+        glVertex3f(  0.5f,  0.5f, -0.5f );
         
         glVertex3f(  0.5f, -0.5f,  0.5f );
         glVertex3f(  0.5f,  0.5f,  0.5f );
@@ -138,6 +138,7 @@ public class ShaderExample {
 
         glClearColor(0.6f, 0.7f, 0.8f, 1.0f);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         // Create a simple shader program
@@ -180,7 +181,7 @@ public class ShaderExample {
             // Create a view-projection matrix
             viewProjMatrix.setPerspective((float) Math.atan((ViewSettings.screenHeight * height / ViewSettings.screenHeightPx) / ViewSettings.distanceToScreen),
                                           (float) width / height, 0.01f, 100.0f)
-                          .lookAt(0.0f, 3.0f, 8.0f,
+                          .lookAt(0.0f, 4.0f, 10.0f,
                                   0.0f, 0.5f, 0.0f,
                                   0.0f, 1.0f, 0.0f)
                           .get(fb);
