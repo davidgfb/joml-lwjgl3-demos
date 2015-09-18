@@ -146,8 +146,8 @@ public class ShaderExample {
         int vs = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vs, 
                 "uniform mat4 viewProjMatrix;" + 
-                "void main(void) {"
-                + "  gl_Position = viewProjMatrix * gl_Vertex;" + 
+                "void main(void) {" + 
+                "  gl_Position = viewProjMatrix * gl_Vertex;" + 
                 "}");
         glCompileShader(vs);
         glAttachShader(program, vs);
@@ -231,7 +231,7 @@ public class ShaderExample {
 
         /* Process window messages in the main thread */
         while (glfwWindowShouldClose(window) == GL_FALSE) {
-            glfwPollEvents();
+            glfwWaitEvents();
         }
     }
 
