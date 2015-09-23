@@ -8,7 +8,6 @@ import org.lwjgl.opengl.*;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
-import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
@@ -43,7 +42,7 @@ public class LwjglDemo {
     }
 
     void init() {
-        glfwSetErrorCallback(errorCallback = errorCallbackPrint(System.err));
+        glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         if (glfwInit() != GL11.GL_TRUE)
             throw new IllegalStateException("Unable to initialize GLFW");
 

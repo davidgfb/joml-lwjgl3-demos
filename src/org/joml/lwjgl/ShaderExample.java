@@ -9,7 +9,6 @@ import org.lwjgl.opengl.GL;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
-import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -47,7 +46,7 @@ public class ShaderExample {
     }
 
     void init() {
-        glfwSetErrorCallback(errorCallback = errorCallbackPrint(System.err));
+        glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         if (glfwInit() != GL_TRUE)
             throw new IllegalStateException("Unable to initialize GLFW");
 
@@ -131,6 +130,17 @@ public class ShaderExample {
         glEnd();
     }
 
+    void renderGrid2() {
+        glBegin(GL_LINES);
+        for (int i = -20; i < 20; i++) {
+            glVertex3f(-1, -20, i);
+            glVertex3f(-1,  20, i);
+            glVertex3f(-1, i, -20.0f);
+            glVertex3f(-1, i,  20.0f);
+        }
+        glEnd();
+    }
+
     void initOpenGLAndRenderInAnotherThread() {
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
@@ -189,7 +199,10 @@ public class ShaderExample {
             // shader uniform.
             glUniformMatrix4fv(matLocation, false, fb);
             // Render the grid without rotating
+            glUniform3f(colorLocation, 0.2f, 0.2f, 0.2f);
             renderGrid();
+            glUniform3f(colorLocation, 0.6f, 0.6f, 0.6f);
+            renderGrid2();
 
             // rotate the cube (45 degrees per second)
             // and translate it by 0.5 in y

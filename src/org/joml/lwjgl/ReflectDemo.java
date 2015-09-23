@@ -1,6 +1,5 @@
 package org.joml.lwjgl;
 
-import static org.lwjgl.glfw.Callbacks.errorCallbackPrint;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -62,7 +61,7 @@ public class ReflectDemo {
     ArcBallCamera cam = new ArcBallCamera();
 
     void init() {
-        glfwSetErrorCallback(errorCallback = errorCallbackPrint(System.err));
+        glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         if (glfwInit() != GL11.GL_TRUE)
             throw new IllegalStateException("Unable to initialize GLFW");
 
