@@ -27,8 +27,8 @@ public class VboDemo {
     GLFWFramebufferSizeCallback fbCallback;
 
     long window;
-    int width;
-    int height;
+    int width = 300;
+    int height = 300;
 
     // JOML matrices
     Matrix4f projMatrix = new Matrix4f();
@@ -57,13 +57,12 @@ public class VboDemo {
 
         // Configure our window
         glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-        int WIDTH = 300;
-        int HEIGHT = 300;
-
-        window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(width, height, "Hello World!", NULL, NULL);
         if ( window == NULL )
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -89,8 +88,8 @@ public class VboDemo {
         ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwSetWindowPos(
             window,
-            (GLFWvidmode.width(vidmode) - WIDTH) / 2,
-            (GLFWvidmode.height(vidmode) - HEIGHT) / 2
+            (GLFWvidmode.width(vidmode) - width) / 2,
+            (GLFWvidmode.height(vidmode) - height) / 2
         );
 
         glfwMakeContextCurrent(window);
@@ -108,40 +107,40 @@ public class VboDemo {
         // an element buffer for it.
         for (int i = 0; i < 4; i++)
             cb.put(0.0f).put(0.0f).put(0.2f);
-        pb.put(  0.5f).put( -0.5f).put( -0.5f );
-        pb.put( -0.5f).put( -0.5f).put( -0.5f );
-        pb.put( -0.5f).put(  0.5f).put( -0.5f );
-        pb.put(  0.5f).put(  0.5f).put( -0.5f );
+        pb.put( 0.5f).put(-0.5f).put(-0.5f);
+        pb.put(-0.5f).put(-0.5f).put(-0.5f);
+        pb.put(-0.5f).put( 0.5f).put(-0.5f);
+        pb.put( 0.5f).put( 0.5f).put(-0.5f);
         for (int i = 0; i < 4; i++)
             cb.put(0.0f).put(0.0f).put(1.0f);
-        pb.put(  0.5f).put( -0.5f).put(  0.5f );
-        pb.put(  0.5f).put(  0.5f).put(  0.5f );
-        pb.put( -0.5f).put(  0.5f).put(  0.5f );
-        pb.put( -0.5f).put( -0.5f).put(  0.5f );
+        pb.put( 0.5f).put(-0.5f).put( 0.5f);
+        pb.put( 0.5f).put( 0.5f).put( 0.5f);
+        pb.put(-0.5f).put( 0.5f).put( 0.5f);
+        pb.put(-0.5f).put(-0.5f).put( 0.5f);
         for (int i = 0; i < 4; i++)
             cb.put(1.0f).put(0.0f).put(0.0f);
-        pb.put(  0.5f).put( -0.5f).put( -0.5f );
-        pb.put(  0.5f).put(  0.5f).put( -0.5f );
-        pb.put(  0.5f).put(  0.5f).put(  0.5f );
-        pb.put(  0.5f).put( -0.5f).put(  0.5f );
+        pb.put( 0.5f).put(-0.5f).put(-0.5f);
+        pb.put( 0.5f).put( 0.5f).put(-0.5f);
+        pb.put( 0.5f).put( 0.5f).put( 0.5f);
+        pb.put( 0.5f).put(-0.5f).put( 0.5f);
         for (int i = 0; i < 4; i++)
             cb.put(0.2f).put(0.0f).put(0.0f);
-        pb.put( -0.5f).put( -0.5f).put(  0.5f );
-        pb.put( -0.5f).put(  0.5f).put(  0.5f );
-        pb.put( -0.5f).put(  0.5f).put( -0.5f );
-        pb.put( -0.5f).put( -0.5f).put( -0.5f );
+        pb.put(-0.5f).put(-0.5f).put( 0.5f);
+        pb.put(-0.5f).put( 0.5f).put( 0.5f);
+        pb.put(-0.5f).put( 0.5f).put(-0.5f);
+        pb.put(-0.5f).put(-0.5f).put(-0.5f);
         for (int i = 0; i < 4; i++)
             cb.put(0.0f).put(1.0f).put(0.0f);
-        pb.put(  0.5f).put(  0.5f).put(  0.5f );
-        pb.put(  0.5f).put(  0.5f).put( -0.5f );
-        pb.put( -0.5f).put(  0.5f).put( -0.5f );
-        pb.put( -0.5f).put(  0.5f).put(  0.5f );
+        pb.put( 0.5f).put( 0.5f).put( 0.5f);
+        pb.put( 0.5f).put( 0.5f).put(-0.5f);
+        pb.put(-0.5f).put( 0.5f).put(-0.5f);
+        pb.put(-0.5f).put( 0.5f).put( 0.5f);
         for (int i = 0; i < 4; i++)
             cb.put(0.0f).put(0.2f).put(0.0f);
-        pb.put(  0.5f).put( -0.5f).put( -0.5f );
-        pb.put(  0.5f).put( -0.5f).put(  0.5f );
-        pb.put( -0.5f).put( -0.5f).put(  0.5f );
-        pb.put( -0.5f).put( -0.5f).put( -0.5f );
+        pb.put( 0.5f).put(-0.5f).put(-0.5f);
+        pb.put( 0.5f).put(-0.5f).put( 0.5f);
+        pb.put(-0.5f).put(-0.5f).put( 0.5f);
+        pb.put(-0.5f).put(-0.5f).put(-0.5f);
         pb.flip();
         cb.flip();
         // build element buffer
