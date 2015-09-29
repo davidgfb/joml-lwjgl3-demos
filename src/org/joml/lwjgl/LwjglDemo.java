@@ -5,9 +5,9 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
+import static org.joml.lwjgl.ViewSettings.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
@@ -18,8 +18,8 @@ public class LwjglDemo {
     GLFWFramebufferSizeCallback fbCallback;
 
     long window;
-    int width;
-    int height;
+    int width = 300;
+    int height = 300;
 
     // JOML matrices
     Matrix4f projMatrix = new Matrix4f();
@@ -51,10 +51,7 @@ public class LwjglDemo {
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-        int WIDTH = 300;
-        int HEIGHT = 300;
-
-        window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(width, height, "Hello World!", NULL, NULL);
         if ( window == NULL )
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -77,12 +74,8 @@ public class LwjglDemo {
             }
         });
 
-        ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowPos(
-            window,
-            (GLFWvidmode.width(vidmode) - WIDTH) / 2,
-            (GLFWvidmode.height(vidmode) - HEIGHT) / 2
-        );
+        GLFWvidmode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        glfwSetWindowPos(window, (vidmode.getWidth() - width) / 2, (vidmode.getHeight() - height) / 2);
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
@@ -151,7 +144,7 @@ public class LwjglDemo {
             // and the screen size and compute the correct aspect ratio based
             // on window width and height. Make sure to cast them to float
             // before dividing, or else we would do an integer division!
-            projMatrix.setPerspective((float) Math.atan((ViewSettings.screenHeight * height / ViewSettings.screenHeightPx) / ViewSettings.distanceToScreen),
+            projMatrix.setPerspective((float) Math.atan((screenHeight * height / screenHeightPx) / distanceToScreen),
                                       (float)width/height, 0.01f, 100.0f)
                        .get(fb);
             glMatrixMode(GL_PROJECTION);

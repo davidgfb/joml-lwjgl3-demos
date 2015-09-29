@@ -5,7 +5,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -85,12 +84,8 @@ public class VboDemo {
             }
         });
 
-        ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowPos(
-            window,
-            (GLFWvidmode.width(vidmode) - width) / 2,
-            (GLFWvidmode.height(vidmode) - height) / 2
-        );
+        GLFWvidmode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        glfwSetWindowPos(window, (vidmode.getWidth() - width) / 2, (vidmode.getHeight() - height) / 2);
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);

@@ -6,7 +6,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -19,8 +18,8 @@ public class ProjectiveShadowDemo {
     GLFWFramebufferSizeCallback fbCallback;
 
     long window;
-    int width;
-    int height;
+    int width = 300;
+    int height = 300;
 
     // FloatBuffer for transferring matrices to OpenGL
     FloatBuffer fb = BufferUtils.createFloatBuffer(16);
@@ -49,10 +48,7 @@ public class ProjectiveShadowDemo {
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
         glfwWindowHint(GLFW_SAMPLES, 4);
 
-        int WIDTH = 300;
-        int HEIGHT = 300;
-
-        window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(width, height, "Hello World!", NULL, NULL);
         if ( window == NULL )
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -75,12 +71,8 @@ public class ProjectiveShadowDemo {
             }
         });
 
-        ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowPos(
-            window,
-            (GLFWvidmode.width(vidmode) - WIDTH) / 2,
-            (GLFWvidmode.height(vidmode) - HEIGHT) / 2
-        );
+        GLFWvidmode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        glfwSetWindowPos(window, (vidmode.getWidth() - width) / 2, (vidmode.getHeight() - height) / 2);
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
@@ -204,7 +196,7 @@ public class ProjectiveShadowDemo {
             renderPlane();
 
             // Render light bulb
-            m2.rotationY(angle).translate(2, 0.8f, 2).transform(lightPos.set(0, 0, 0, 1));
+            m2.rotationY(angle).translate(0, 0.8f, 2).transform(lightPos.set(0, 0, 0, 1));
             m.mul4x3(m2, m2).get(fb);
             glLoadMatrixf(fb);
             renderLight();
