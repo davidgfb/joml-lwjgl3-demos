@@ -190,7 +190,7 @@ public class ShaderExample {
             // rotate the cube (45 degrees per second)
             // and translate it by 0.5 in y
             viewProjMatrix.translate(0.0f, 0.5f, 0.0f)
-                          .rotate(q.rotateY((float) Math.toRadians(45) * dt))
+                          .rotate(q.rotateY((float) Math.toRadians(45) * dt).normalize())
                           .get(fb);
             // Upload the matrix
             glUniformMatrix4fv(matLocation, false, fb);
