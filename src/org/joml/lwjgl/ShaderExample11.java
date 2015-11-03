@@ -139,11 +139,11 @@ public class ShaderExample11 {
         glfwSwapInterval(0);
         GLCapabilities caps = GL.createCapabilities();
         if (!caps.GL_ARB_shader_objects)
-            throw new AssertionError("This demo requires the ARB_shader_objects extension");
+            throw new UnsupportedOperationException("This demo requires the ARB_shader_objects extension");
         if (!caps.GL_ARB_vertex_shader)
-            throw new AssertionError("This demo requires the ARB_vertex_shader extension");
+            throw new UnsupportedOperationException("This demo requires the ARB_vertex_shader extension");
         if (!caps.GL_ARB_fragment_shader)
-            throw new AssertionError("This demo requires the ARB_fragment_shader extension");
+            throw new UnsupportedOperationException("This demo requires the ARB_fragment_shader extension");
 
         glClearColor(0.6f, 0.7f, 0.8f, 1.0f);
         glEnable(GL_DEPTH_TEST);
@@ -235,7 +235,13 @@ public class ShaderExample11 {
          */
         new Thread(new Runnable() {
             public void run() {
-                initOpenGLAndRenderInAnotherThread();
+                try {
+                    initOpenGLAndRenderInAnotherThread();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    glfwSetWindowShouldClose(window, 1);
+                    glfwPostEmptyEvent();
+                }
             }
         }).start();
 
