@@ -72,7 +72,7 @@ public class ProjectiveShadowDemo {
         });
 
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowPos(window, (vidmode.getWidth() - width) / 2, (vidmode.getHeight() - height) / 2);
+        glfwSetWindowPos(window, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
@@ -172,17 +172,19 @@ public class ProjectiveShadowDemo {
             glViewport(0, 0, width, height);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-            m.setPerspective((float) Math.atan((ViewSettings.screenHeight * height / ViewSettings.screenHeightPx) / ViewSettings.distanceToScreen),
-                             (float)width/height, 0.01f, 100.0f).get(fb);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(
+                m.setPerspective(
+                    (float) Math.toRadians(30.0f),
+                    (float)width/height,
+                    0.01f, 100.0f).get(fb));
 
-            m.setLookAt(1.0f, 6.0f, 12.0f,
-                        0.0f, 0.0f, 0.0f,
-                        0.0f, 1.0f, 0.0f)
-                      .rotateY(angle / 5.0f).get(fb);
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(
+                m.setLookAt(1.0f, 6.0f, 12.0f,
+                            0.0f, 0.0f, 0.0f,
+                            0.0f, 1.0f, 0.0f)
+                  .rotateY(angle / 5.0f).get(fb));
 
             // always write stencil = 1
             glStencilFunc(GL_ALWAYS, 1, 1);
@@ -191,24 +193,21 @@ public class ProjectiveShadowDemo {
             renderCube(false);
 
             // Render the plane on which to project the shadow
-            m.mul4x3(planeTransform, m2).get(fb);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(m.mul4x3(planeTransform, m2).get(fb));
             renderPlane();
 
             // Render light bulb
             m2.rotationY(angle).translate(0, 0.8f, 2).transform(lightPos.set(0, 0, 0, 1));
-            m.mul4x3(m2, m2).get(fb);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(m.mul4x3(m2, m2).get(fb));
             renderLight();
 
             // Render projected shadow of the cube
-            m.shadow(lightPos, planeTransform).get(fb);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(m.shadow(lightPos, planeTransform).get(fb));
             // Draw only on the stenciled area
             glStencilFunc(GL_EQUAL, 1, 1);
             glEnable(GL_POLYGON_OFFSET_FILL);
             // use polygon offset to combat z-fighting between plane and projected shadow
-            glPolygonOffset(-1.f,-1.f);
+            glPolygonOffset(-1.0f, -1.0f);
             renderCube(true);
             glDisable(GL_POLYGON_OFFSET_FILL);
 

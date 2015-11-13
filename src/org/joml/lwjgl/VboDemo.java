@@ -85,7 +85,7 @@ public class VboDemo {
         });
 
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowPos(window, (vidmode.getWidth() - width) / 2, (vidmode.getHeight() - height) / 2);
+        glfwSetWindowPos(window, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
@@ -190,10 +190,9 @@ public class VboDemo {
             // on window width and height. Make sure to cast them to float
             // before dividing, or else we would do an integer division!
             projMatrix.setPerspective((float) Math.toRadians(30.0f),
-                                      (float)width/height, 0.01f, 100.0f)
-                       .get(fb);
+                                      (float)width/height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(projMatrix.get(fb));
 
             // Build a model-view matrix which first rotates the cube
             // about the Y-axis and then lets a "camera" look at that
@@ -202,10 +201,9 @@ public class VboDemo {
                                  0.0f, 0.0f, 0.0f,
                                  0.0f, 1.0f, 0.0f)
                       // rotate 90 degrees per second
-                      .rotateY(angle * (float) Math.toRadians(90))
-                      .get(fb);
+                      .rotateY(angle * (float) Math.toRadians(90));
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(viewMatrix.get(fb));
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 

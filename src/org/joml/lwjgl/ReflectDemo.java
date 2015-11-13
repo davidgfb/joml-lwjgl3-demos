@@ -121,7 +121,7 @@ public class ReflectDemo {
         });
 
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowPos(window, (vidmode.getWidth() - width) / 2, (vidmode.getHeight() - height) / 2);
+        glfwSetWindowPos(window, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
 
         IntBuffer framebufferSize = BufferUtils.createIntBuffer(2);
         nglfwGetFramebufferSize(window, memAddress(framebufferSize), memAddress(framebufferSize) + 4);
@@ -252,24 +252,22 @@ public class ReflectDemo {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
             mat.setPerspective((float) Math.atan((ViewSettings.screenHeight * height / ViewSettings.screenHeightPx) / ViewSettings.distanceToScreen),
-                               (float) width / height, 0.01f, 100.0f).get(fb);
+                               (float) width / height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(mat.get(fb));
 
             /*
              * Obtain the camera's view matrix and render grid.
              */
-            cam.viewMatrix(mat.identity()).get(fb);
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(cam.viewMatrix(mat.identity()).get(fb));
 
             /* Stencil the mirror */
             mirrorMatrix.set(mat)
                         .translate(mirrorPosition)
                         .rotate(mirrorOrientation)
-                        .scale(15.0f, 8.5f, 1.0f)
-                        .get(fb);
-            glLoadMatrixf(fb);
+                        .scale(15.0f, 8.5f, 1.0f);
+            glLoadMatrixf(mirrorMatrix.get(fb));
             glEnable(GL_STENCIL_TEST);
             glColorMask(false, false, false, false);
             glDisable(GL_DEPTH_TEST);
@@ -283,9 +281,8 @@ public class ReflectDemo {
 
             /* Render the reflected scene */
             reflectMatrix.set(mat)
-                         .reflect(mirrorOrientation, mirrorPosition)
-                         .get(fb);
-            glLoadMatrixf(fb);
+                         .reflect(mirrorOrientation, mirrorPosition);
+            glLoadMatrixf(reflectMatrix.get(fb));
             renderGrid();
             glFrontFace(GL_CW);
             renderCube();

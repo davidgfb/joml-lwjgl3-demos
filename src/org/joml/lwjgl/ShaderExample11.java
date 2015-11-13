@@ -84,7 +84,7 @@ public class ShaderExample11 {
         });
 
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowPos(window, (vidmode.getWidth() - width) / 2, (vidmode.getHeight() - height) / 2);
+        glfwSetWindowPos(window, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
 
         glfwShowWindow(window);
     }
@@ -125,7 +125,7 @@ public class ShaderExample11 {
 
     void renderGrid() {
         glBegin(GL_LINES);
-        for (int i = -20; i < 20; i++) {
+        for (int i = -20; i <= 20; i++) {
             glVertex3f(-20.0f, 0.0f, i);
             glVertex3f( 20.0f, 0.0f, i);
             glVertex3f(i, 0.0f, -20.0f);
@@ -192,11 +192,10 @@ public class ShaderExample11 {
                                           (float) width / height, 0.01f, 100.0f)
                           .lookAt(0.0f, 4.0f, 10.0f,
                                   0.0f, 0.5f, 0.0f,
-                                  0.0f, 1.0f, 0.0f)
-                          .get(fb);
+                                  0.0f, 1.0f, 0.0f);
             // Upload the matrix stored in the FloatBuffer to the
             // shader uniform.
-            glUniformMatrix4fvARB(matLocation, false, fb);
+            glUniformMatrix4fvARB(matLocation, false, viewProjMatrix.get(fb));
             // Render the grid without rotating
             glUniform3fARB(colorLocation, 0.3f, 0.3f, 0.3f);
             renderGrid();
@@ -204,10 +203,9 @@ public class ShaderExample11 {
             // rotate the cube (45 degrees per second)
             // and translate it by 0.5 in y
             viewProjMatrix.translate(0.0f, 0.5f, 0.0f)
-                          .rotate(q.rotateY((float) Math.toRadians(45) * dt).normalize())
-                          .get(fb);
+                          .rotate(q.rotateY((float) Math.toRadians(45) * dt).normalize());
             // Upload the matrix
-            glUniformMatrix4fvARB(matLocation, false, fb);
+            glUniformMatrix4fvARB(matLocation, false, viewProjMatrix.get(fb));
 
             // Render solid cube with outlines
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
