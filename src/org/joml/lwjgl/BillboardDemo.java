@@ -22,7 +22,7 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
-public class BillboardCylindricalDemo {
+public class BillboardDemo {
     GLFWErrorCallback errorCallback;
     GLFWKeyCallback keyCallback;
     GLFWFramebufferSizeCallback fbCallback;
@@ -277,6 +277,6 @@ public class BillboardCylindricalDemo {
     }
 
     public static void main(String[] args) {
-        new BillboardCylindricalDemo().run();
+        new BillboardDemo().run();
     }
 }
