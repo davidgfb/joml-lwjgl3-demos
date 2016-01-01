@@ -58,6 +58,7 @@ public class BillboardDemo {
     ArcBallCamera cam = new ArcBallCamera();
     Vector3f[] boxes = new Vector3f[40];
     boolean spherical;
+    boolean wireframe;
 
     void resetBoxes() {
         for (int i = 0; i < boxes.length; i++) {
@@ -85,17 +86,21 @@ public class BillboardDemo {
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
+        System.out.println("Press 'R' to randomly reposition the boxes.");
         System.out.println("Press 'S' to toggle between spherical and cylindrical billboards.");
+        System.out.println("Press 'W' to toggle between wireframe and filled.");
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                     glfwSetWindowShouldClose(window, GL_TRUE);
 
-                if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
+                if (key == GLFW_KEY_R && action == GLFW_PRESS) {
                     resetBoxes();
                 } else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
                     spherical = !spherical;
+                } else if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+                    wireframe = !wireframe;
                 }
             }
         });
@@ -258,6 +263,14 @@ public class BillboardDemo {
 
             /* Determine camera origin */
             mat.origin(origin);
+
+            int mode;
+            if (wireframe) {
+                mode = GL_LINE;
+            } else {
+                mode = GL_FILL;
+            }
+            glPolygonMode(GL_FRONT_AND_BACK, mode);
 
             /* Render each cube */
             for (int i = 0; i < boxes.length; i++) {
