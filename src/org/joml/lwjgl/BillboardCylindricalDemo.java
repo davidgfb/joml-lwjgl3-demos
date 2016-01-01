@@ -57,6 +57,7 @@ public class BillboardCylindricalDemo {
 
     ArcBallCamera cam = new ArcBallCamera();
     Vector3f[] boxes = new Vector3f[40];
+    boolean spherical;
 
     void resetBoxes() {
         for (int i = 0; i < boxes.length; i++) {
@@ -84,6 +85,7 @@ public class BillboardCylindricalDemo {
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
+        System.out.println("Press 'S' to toggle between spherical and cylindrical billboards.");
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
@@ -92,6 +94,8 @@ public class BillboardCylindricalDemo {
 
                 if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
                     resetBoxes();
+                } else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+                    spherical = !spherical;
                 }
             }
         });
@@ -258,7 +262,11 @@ public class BillboardCylindricalDemo {
             /* Render each cube */
             for (int i = 0; i < boxes.length; i++) {
                 /* Build billboard matrix and multiply with view matrix*/
-                mat.mul(billboardMatrix.billboardCylindrical(boxes[i], origin, up), billboardMatrix);
+                if (spherical)
+                    billboardMatrix.billboardSpherical(boxes[i], origin, up);
+                else
+                    billboardMatrix.billboardCylindrical(boxes[i], origin, up);
+                mat.mul(billboardMatrix, billboardMatrix);
                 glLoadMatrixf(billboardMatrix.get(fb));
                 renderCube();
             }
