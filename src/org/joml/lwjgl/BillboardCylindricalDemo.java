@@ -307,10 +307,8 @@ public class BillboardCylindricalDemo {
 
             /* Render each cube */
             for (int i = 0; i < boxes.length; i++) {
-                /* Build billboard matrix */
-                billboardMatrix.billboardCylindrical(boxes[i], origin, up);
-                /* Multiply with view matrix */
-                mat.mul(billboardMatrix, billboardMatrix);
+                /* Build billboard matrix and multiply with view matrix*/
+                mat.mul(billboardMatrix.billboardCylindrical(boxes[i], origin, up), billboardMatrix);
                 glLoadMatrixf(billboardMatrix.get(fb));
                 renderCube();
             }
