@@ -57,7 +57,7 @@ public class BillboardDemo {
 
     ArcBallCamera cam = new ArcBallCamera();
     Vector3f[] boxes = new Vector3f[40];
-    boolean spherical;
+    int billboardMode = 0;
     boolean wireframe;
 
     void resetBoxes() {
@@ -87,7 +87,7 @@ public class BillboardDemo {
             throw new RuntimeException("Failed to create the GLFW window");
 
         System.out.println("Press 'R' to randomly reposition the boxes.");
-        System.out.println("Press 'S' to toggle between spherical and cylindrical billboards.");
+        System.out.println("Press 'B' to toggle between spherical, cylindrical and spherical shortest arc billboards.");
         System.out.println("Press 'W' to toggle between wireframe and filled.");
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             @Override
@@ -97,8 +97,14 @@ public class BillboardDemo {
 
                 if (key == GLFW_KEY_R && action == GLFW_PRESS) {
                     resetBoxes();
-                } else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-                    spherical = !spherical;
+                } else if (key == GLFW_KEY_B && action == GLFW_PRESS) {
+                    billboardMode = (billboardMode + 1) % 3;
+                    if (billboardMode == 0)
+                        System.out.println("Using cylindrical billboards");
+                    else if (billboardMode == 1)
+                        System.out.println("Using spherical billboards with up = +Y");
+                    else if (billboardMode == 2)
+                        System.out.println("Using spherical shortest arc billboards");
                 } else if (key == GLFW_KEY_W && action == GLFW_PRESS) {
                     wireframe = !wireframe;
                 }
@@ -275,10 +281,13 @@ public class BillboardDemo {
             /* Render each cube */
             for (int i = 0; i < boxes.length; i++) {
                 /* Build billboard matrix and multiply with view matrix*/
-                if (spherical)
-                    billboardMatrix.billboardSpherical(boxes[i], origin, up);
-                else
+                if (billboardMode == 0) // <- cylindrical
                     billboardMatrix.billboardCylindrical(boxes[i], origin, up);
+                else if (billboardMode == 1) // spherical
+                    billboardMatrix.billboardSpherical(boxes[i], origin, up);
+                else if (billboardMode == 2) // shortest arc spherical
+                    billboardMatrix.billboardSpherical(boxes[i], origin);
+
                 mat.mul(billboardMatrix, billboardMatrix);
                 glLoadMatrixf(billboardMatrix.get(fb));
                 renderCube();
