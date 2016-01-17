@@ -92,7 +92,7 @@ public class BillboardDemo {
             throw new RuntimeException("Failed to create the GLFW window");
 
         System.out.println("Press 'R' to randomly reposition the boxes.");
-        System.out.println("Press 'B' to toggle between spherical, cylindrical and spherical shortest arc billboards.");
+        System.out.println("Press 'B' to toggle between no, spherical, cylindrical and spherical shortest arc billboards.");
         System.out.println("Press 'F' to freeze current box rotations.");
         System.out.println("Press 'W' to toggle between wireframe and filled.");
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
