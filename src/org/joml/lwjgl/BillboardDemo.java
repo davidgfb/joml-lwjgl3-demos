@@ -304,9 +304,9 @@ public class BillboardDemo {
                         modelMatrices[i].translation(boxes[i]);
                     else if (billboardMode == 1) // cylindrical
                         modelMatrices[i].billboardCylindrical(boxes[i], origin, up);
-                    else if (billboardMode == 1) // spherical
+                    else if (billboardMode == 2) // spherical
                         modelMatrices[i].billboardSpherical(boxes[i], origin, up);
-                    else if (billboardMode == 2) // shortest arc spherical
+                    else if (billboardMode == 3) // shortest arc spherical
                         modelMatrices[i].billboardSpherical(boxes[i], origin);
                 }
 
