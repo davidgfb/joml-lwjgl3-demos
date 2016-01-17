@@ -122,7 +122,7 @@ public class BillboardDemo {
                 } else if (key == GLFW_KEY_F && action == GLFW_PRESS) {
                     freeze = !freeze;
                     if (freeze)
-                        System.out.println("Freezed updating box model matrices");
+                        System.out.println("Froze updating box model matrices");
                     else
                         System.out.println("Resumed updating box model matrices");
                 }
