@@ -56,19 +56,24 @@ public class BillboardDemo {
     }
 
     ArcBallCamera cam = new ArcBallCamera();
-    Vector3f[] boxes = new Vector3f[40];
-    int billboardMode = 0;
+    int numBoxes = 40;
+    Vector3f[] boxes = new Vector3f[numBoxes];
+    Matrix4f[] modelMatrices = new Matrix4f[numBoxes];
+    int billboardMode = 1; // <- start with cylindrical billboards
     boolean wireframe;
+    boolean freeze;
 
     void resetBoxes() {
         for (int i = 0; i < boxes.length; i++) {
             boxes[i].set((float) Math.random() *  40.0f - 20.0f, 0.0f, (float) Math.random() * 40.0f - 20.0f);
+            modelMatrices[i].translation(boxes[i]);
         }
     }
 
     void init() {
         for (int i = 0; i < boxes.length; i++) {
             boxes[i] = new Vector3f();
+            modelMatrices[i] = new Matrix4f();
         }
         resetBoxes();
 
@@ -88,6 +93,7 @@ public class BillboardDemo {
 
         System.out.println("Press 'R' to randomly reposition the boxes.");
         System.out.println("Press 'B' to toggle between spherical, cylindrical and spherical shortest arc billboards.");
+        System.out.println("Press 'F' to freeze current box rotations.");
         System.out.println("Press 'W' to toggle between wireframe and filled.");
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             @Override
@@ -100,13 +106,25 @@ public class BillboardDemo {
                 } else if (key == GLFW_KEY_B && action == GLFW_PRESS) {
                     billboardMode = (billboardMode + 1) % 3;
                     if (billboardMode == 0)
-                        System.out.println("Using cylindrical billboards");
+                        System.out.println("Not using billboards");
                     else if (billboardMode == 1)
-                        System.out.println("Using spherical billboards with up = +Y");
+                        System.out.println("Using cylindrical billboards");
                     else if (billboardMode == 2)
+                        System.out.println("Using spherical billboards with up = +Y");
+                    else if (billboardMode == 3)
                         System.out.println("Using spherical shortest arc billboards");
                 } else if (key == GLFW_KEY_W && action == GLFW_PRESS) {
                     wireframe = !wireframe;
+                    if (wireframe)
+                        System.out.println("Using wireframe rendering");
+                    else
+                        System.out.println("Using filled rendering");
+                } else if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+                    freeze = !freeze;
+                    if (freeze)
+                        System.out.println("Freezed updating box model matrices");
+                    else
+                        System.out.println("Resumed updating box model matrices");
                 }
             }
         });
@@ -227,8 +245,8 @@ public class BillboardDemo {
 
         // Objects for building the billboard matrix
         Vector3f origin = new Vector3f();
-        Matrix4f billboardMatrix = new Matrix4f();
         Vector3f up = new Vector3f(0, 1, 0);
+        Matrix4f modelViewProj = new Matrix4f();
 
         cam.setAlpha((float) Math.toRadians(-20));
         cam.setBeta((float) Math.toRadians(20));
@@ -280,16 +298,21 @@ public class BillboardDemo {
 
             /* Render each cube */
             for (int i = 0; i < boxes.length; i++) {
-                /* Build billboard matrix and multiply with view matrix*/
-                if (billboardMode == 0) // <- cylindrical
-                    billboardMatrix.billboardCylindrical(boxes[i], origin, up);
-                else if (billboardMode == 1) // spherical
-                    billboardMatrix.billboardSpherical(boxes[i], origin, up);
-                else if (billboardMode == 2) // shortest arc spherical
-                    billboardMatrix.billboardSpherical(boxes[i], origin);
+                /* Build box model matrix */
+                if (!freeze) {
+                    if (billboardMode == 0) // not using billboards
+                        modelMatrices[i].translation(boxes[i]);
+                    else if (billboardMode == 1) // cylindrical
+                        modelMatrices[i].billboardCylindrical(boxes[i], origin, up);
+                    else if (billboardMode == 1) // spherical
+                        modelMatrices[i].billboardSpherical(boxes[i], origin, up);
+                    else if (billboardMode == 2) // shortest arc spherical
+                        modelMatrices[i].billboardSpherical(boxes[i], origin);
+                }
 
-                mat.mul(billboardMatrix, billboardMatrix);
-                glLoadMatrixf(billboardMatrix.get(fb));
+                /* Multiply with view-projection matrix */
+                mat.mul(modelMatrices[i], modelViewProj);
+                glLoadMatrixf(modelViewProj.get(fb));
                 renderCube();
             }
 
