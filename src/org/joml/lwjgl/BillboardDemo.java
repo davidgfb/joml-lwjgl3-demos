@@ -104,7 +104,7 @@ public class BillboardDemo {
                 if (key == GLFW_KEY_R && action == GLFW_PRESS) {
                     resetBoxes();
                 } else if (key == GLFW_KEY_B && action == GLFW_PRESS) {
-                    billboardMode = (billboardMode + 1) % 3;
+                    billboardMode = (billboardMode + 1) % 4;
                     if (billboardMode == 0)
                         System.out.println("Not using billboards");
                     else if (billboardMode == 1)
