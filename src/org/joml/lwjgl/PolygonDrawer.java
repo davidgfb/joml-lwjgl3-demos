@@ -70,6 +70,8 @@ public class PolygonDrawer {
         window = glfwCreateWindow(width, height, "Polygon Demo", NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
+        long cursor = glfwCreateStandardCursor(GLFW.GLFW_CROSSHAIR_CURSOR);
+        glfwSetCursor(window, cursor);
 
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             @Override
