@@ -32,8 +32,6 @@ public class PolygonDrawer {
     int width = 800;
     int height = 600;
     int x, y;
-    float zoom = 20;
-    int mouseX, mouseY;
     boolean down;
     float[] verticesXY = new float[1024 * 1024];
     int num = 0;
