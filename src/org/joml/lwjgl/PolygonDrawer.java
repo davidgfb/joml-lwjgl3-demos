@@ -110,6 +110,7 @@ public class PolygonDrawer {
                 if (action == GLFW_PRESS) {
                     down = true;
                     num = 0;
+                    inside = false;
                 } else if (action == GLFW_RELEASE) {
                     down = false;
                     pointIntersection = new PolygonPointIntersection(verticesXY, num);
