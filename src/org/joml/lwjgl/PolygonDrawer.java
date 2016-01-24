@@ -5,13 +5,26 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memAddress;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.channels.FileChannel;
 
 import org.joml.PolygonPointIntersection;
 import org.joml.PolygonPointIntersection.Interval;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.*;
-import org.lwjgl.opengl.*;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWCursorPosCallback;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
+import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWMouseButtonCallback;
+import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
 
 /**
  * This demo showcases the {@link PolygonPointIntersection} algorithm. The outlines of a polygon can be drawn with the mouse and an intersection test is
@@ -66,6 +79,8 @@ public class PolygonDrawer {
 
         System.out.println("Draw a polygon with holding the left mouse button down");
         System.out.println("Move the mouse cursor in and out of the polygon");
+        System.out.println("Press 'S' to load save the current polygon in file 'poly.gon'");
+        System.out.println("Press 'L' to load a previously saved polygon from file 'poly.gon'");
 
         window = glfwCreateWindow(width, height, "Polygon Demo", NULL, NULL);
         if (window == NULL)
@@ -78,6 +93,43 @@ public class PolygonDrawer {
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                     glfwSetWindowShouldClose(window, GL_TRUE);
+                if (key == GLFW_KEY_L && action == GLFW_RELEASE) {
+                    try {
+                        RandomAccessFile rFile = new RandomAccessFile("poly.gon", "r");
+                        int size = (int) rFile.length();
+                        FileChannel inChannel = rFile.getChannel();
+                        ByteBuffer buf_in = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
+                        while (buf_in.hasRemaining()) {
+                            inChannel.read(buf_in);
+                        }
+                        buf_in.flip();
+                        FloatBuffer fb = buf_in.asFloatBuffer();
+                        num = fb.remaining() / 2;
+                        fb.get(verticesXY, 0, num * 2);
+                        inChannel.close();
+                        rFile.close();
+                        pointIntersection = new PolygonPointIntersection(verticesXY, num);
+                        working = new Interval[pointIntersection.workingSize()];
+                    } catch (IOException e) {
+                        // just ignore everything :)
+                    }
+                } else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
+                    try {
+                        RandomAccessFile rFile = new RandomAccessFile("poly.gon", "rw");
+                        rFile.setLength(0);
+                        FileChannel inChannel = rFile.getChannel();
+                        ByteBuffer buf_in = ByteBuffer.allocateDirect(num * 2 * 4).order(ByteOrder.nativeOrder());
+                        FloatBuffer fb = buf_in.asFloatBuffer();
+                        fb.put(verticesXY, 0, num * 2);
+                        while (buf_in.hasRemaining()) {
+                            inChannel.write(buf_in);
+                        }
+                        inChannel.close();
+                        rFile.close();
+                    } catch (IOException e) {
+                        // just ignore everything :)
+                    }
+                }
             }
         });
         glfwSetFramebufferSizeCallback(window, fbCallback = new GLFWFramebufferSizeCallback() {
