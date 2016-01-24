@@ -139,6 +139,8 @@ public class PolygonDrawer {
         glBegin(GL_LINE_STRIP);
         if (num > 0) {
             for (int i = 0; i < num; i++) {
+                if (i == num - 1 && down)
+                    glColor3f(0.8f, 0.8f, 0.8f);
                 glVertex2f(verticesXY[2 * i + 0], verticesXY[2 * i + 1]);
             }
             glVertex2f(verticesXY[0], verticesXY[1]);
