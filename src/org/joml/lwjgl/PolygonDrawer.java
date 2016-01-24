@@ -5,10 +5,8 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memAddress;
 
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import org.joml.Matrix4f;
 import org.joml.PolygonPointIntersection;
 import org.joml.PolygonPointIntersection.Interval;
 import org.lwjgl.BufferUtils;
@@ -95,7 +93,7 @@ public class PolygonDrawer {
             @Override
             public void invoke(long window, double xpos, double ypos) {
                 x = (int) xpos;
-                y = height - (int) ypos;
+                y = (int) ypos;
                 if (down) {
                     verticesXY[2 * num + 0] = x;
                     verticesXY[2 * num + 1] = y;
@@ -154,17 +152,13 @@ public class PolygonDrawer {
         glClearColor(0.99f, 0.99f, 0.99f, 1.0f);
         glLineWidth(1.8f);
 
-        Matrix4f mat = new Matrix4f();
-        // FloatBuffer for transferring matrices to OpenGL
-        FloatBuffer fb = BufferUtils.createFloatBuffer(16);
-
         while (glfwWindowShouldClose(window) == GL_FALSE) {
             glViewport(0, 0, width, height);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            mat.identity().ortho2D(0, width, 0, height);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(mat.get(fb));
+            glLoadIdentity();
+            glOrtho(0, width, height, 0, -1, 11);
             glMatrixMode(GL_MODELVIEW);
             glLoadIdentity();
 
