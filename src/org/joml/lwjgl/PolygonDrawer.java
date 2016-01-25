@@ -111,7 +111,7 @@ public class PolygonDrawer {
         glfwWindowHint(GLFW_SAMPLES, 4);
 
         System.out.println("Draw polygons with holding the left mouse button down");
-        System.out.println("Move the mouse cursor in and out of the polygon");
+        System.out.println("Move the mouse cursor in and out of the polygons");
         System.out.println("Press 'C' to clear all polygons");
         // System.out.println("Press 'S' to load save the current polygon in file 'poly.gon'");
         // System.out.println("Press 'L' to load a previously saved polygon from file 'poly.gon'");
