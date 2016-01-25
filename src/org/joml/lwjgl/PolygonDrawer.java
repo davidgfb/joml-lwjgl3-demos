@@ -64,6 +64,45 @@ public class PolygonDrawer {
         }
     }
 
+    void store(String file) {
+        try {
+            RandomAccessFile rFile = new RandomAccessFile(file, "rw");
+            rFile.setLength(0);
+            FileChannel inChannel = rFile.getChannel();
+            ByteBuffer buf_in = ByteBuffer.allocateDirect(num * 2 * 4).order(ByteOrder.nativeOrder());
+            FloatBuffer fb = buf_in.asFloatBuffer();
+            fb.put(verticesXY, 0, num * 2);
+            while (buf_in.hasRemaining()) {
+                inChannel.write(buf_in);
+            }
+            inChannel.close();
+            rFile.close();
+        } catch (IOException e) {
+            // just ignore everything :)
+        }
+    }
+
+    void load(String file) {
+        try {
+            RandomAccessFile rFile = new RandomAccessFile(file, "r");
+            int size = (int) rFile.length();
+            FileChannel inChannel = rFile.getChannel();
+            ByteBuffer buf_in = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
+            while (buf_in.hasRemaining()) {
+                inChannel.read(buf_in);
+            }
+            buf_in.flip();
+            FloatBuffer fb = buf_in.asFloatBuffer();
+            num = fb.remaining() / 2;
+            fb.get(verticesXY, 0, num * 2);
+            inChannel.close();
+            rFile.close();
+            pointIntersection = new PolygonPointIntersection(verticesXY, num);
+        } catch (IOException e) {
+            // just ignore everything :)
+        }
+    }
+
     void init() {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         if (glfwInit() != GL11.GL_TRUE)
@@ -92,40 +131,9 @@ public class PolygonDrawer {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                     glfwSetWindowShouldClose(window, GL_TRUE);
                 if (key == GLFW_KEY_L && action == GLFW_RELEASE) {
-                    try {
-                        RandomAccessFile rFile = new RandomAccessFile("poly.gon", "r");
-                        int size = (int) rFile.length();
-                        FileChannel inChannel = rFile.getChannel();
-                        ByteBuffer buf_in = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
-                        while (buf_in.hasRemaining()) {
-                            inChannel.read(buf_in);
-                        }
-                        buf_in.flip();
-                        FloatBuffer fb = buf_in.asFloatBuffer();
-                        num = fb.remaining() / 2;
-                        fb.get(verticesXY, 0, num * 2);
-                        inChannel.close();
-                        rFile.close();
-                        pointIntersection = new PolygonPointIntersection(verticesXY, num);
-                    } catch (IOException e) {
-                        // just ignore everything :)
-                    }
+                    load("poly.gon");
                 } else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
-                    try {
-                        RandomAccessFile rFile = new RandomAccessFile("poly.gon", "rw");
-                        rFile.setLength(0);
-                        FileChannel inChannel = rFile.getChannel();
-                        ByteBuffer buf_in = ByteBuffer.allocateDirect(num * 2 * 4).order(ByteOrder.nativeOrder());
-                        FloatBuffer fb = buf_in.asFloatBuffer();
-                        fb.put(verticesXY, 0, num * 2);
-                        while (buf_in.hasRemaining()) {
-                            inChannel.write(buf_in);
-                        }
-                        inChannel.close();
-                        rFile.close();
-                    } catch (IOException e) {
-                        // just ignore everything :)
-                    }
+                    store("poly.gon");
                 }
             }
         });
@@ -180,6 +188,9 @@ public class PolygonDrawer {
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
         glfwShowWindow(window);
+
+        // auto-restore last autosave
+        load("autopoly.gon");
     }
 
     void renderPolygon() {
@@ -220,6 +231,9 @@ public class PolygonDrawer {
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
+
+        // autosave current polygon
+        store("autopoly.gon");
     }
 
     public static void main(String[] args) {
