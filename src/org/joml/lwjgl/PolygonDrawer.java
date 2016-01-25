@@ -31,7 +31,6 @@ public class PolygonDrawer {
     GLFWFramebufferSizeCallback fbCallback;
     GLFWCursorPosCallback cpCallback;
     GLFWMouseButtonCallback mbCallback;
-    PolygonPointIntersection pointIntersection;
 
     long window;
     int width = 800;
@@ -40,9 +39,11 @@ public class PolygonDrawer {
     boolean down;
     float[] verticesXY = new float[1024 * 1024];
     int[] polygons = new int[0];
+    PolygonPointIntersection pointIntersection = new PolygonPointIntersection(verticesXY, polygons, 0);
     int first = 0;
     int num = 0;
     boolean inside;
+    int querymicroseconds = 0;
 
     void run() {
         try {
@@ -98,6 +99,10 @@ public class PolygonDrawer {
     // // just ignore everything :)
     // }
     // }
+    
+    void updateStats() {
+        glfwSetWindowTitle(window, "Polygon Demo (" + num + " vertices @ " + querymicroseconds + " µs.)");
+    }
 
     void init() {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
@@ -134,7 +139,7 @@ public class PolygonDrawer {
                 } else if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
                     num = 0;
                     polygons = new int[0];
-                    glfwSetWindowTitle(window, "Polygon Demo");
+                    updateStats();
                 }
             }
         });
@@ -156,10 +161,15 @@ public class PolygonDrawer {
                     verticesXY[2 * num + 0] = x;
                     verticesXY[2 * num + 1] = y;
                     num++;
-                    glfwSetWindowTitle(window, "Polygon Demo (" + num + " vertices)");
+                    updateStats();
                 } else {
-                    if (pointIntersection != null)
+                    if (pointIntersection != null) {
+                        long time1 = System.nanoTime();
                         inside = pointIntersection.pointInPolygon(x, y);
+                        long time2 = System.nanoTime();
+                        querymicroseconds = (int) ((time2 - time1) / 1E3);
+                        updateStats();
+                    }
                     else
                         inside = false;
                 }
