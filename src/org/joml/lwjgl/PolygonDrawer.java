@@ -134,6 +134,7 @@ public class PolygonDrawer {
                 } else if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
                     num = 0;
                     polygons = new int[0];
+                    glfwSetWindowTitle(window, "Polygon Demo");
                 }
             }
         });
@@ -155,6 +156,7 @@ public class PolygonDrawer {
                     verticesXY[2 * num + 0] = x;
                     verticesXY[2 * num + 1] = y;
                     num++;
+                    glfwSetWindowTitle(window, "Polygon Demo (" + num + " vertices)");
                 } else {
                     if (pointIntersection != null)
                         inside = pointIntersection.pointInPolygon(x, y);
