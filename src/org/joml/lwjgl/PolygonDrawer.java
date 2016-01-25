@@ -5,13 +5,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memAddress;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.nio.channels.FileChannel;
 
 import org.joml.PolygonPointIntersection;
 import org.lwjgl.BufferUtils;
@@ -45,6 +39,8 @@ public class PolygonDrawer {
     int x, y;
     boolean down;
     float[] verticesXY = new float[1024 * 1024];
+    int[] polygons = new int[0];
+    int first = 0;
     int num = 0;
     boolean inside;
 
@@ -64,44 +60,44 @@ public class PolygonDrawer {
         }
     }
 
-    void store(String file) {
-        try {
-            RandomAccessFile rFile = new RandomAccessFile(file, "rw");
-            rFile.setLength(0);
-            FileChannel inChannel = rFile.getChannel();
-            ByteBuffer buf_in = ByteBuffer.allocateDirect(num * 2 * 4).order(ByteOrder.nativeOrder());
-            FloatBuffer fb = buf_in.asFloatBuffer();
-            fb.put(verticesXY, 0, num * 2);
-            while (buf_in.hasRemaining()) {
-                inChannel.write(buf_in);
-            }
-            inChannel.close();
-            rFile.close();
-        } catch (IOException e) {
-            // just ignore everything :)
-        }
-    }
-
-    void load(String file) {
-        try {
-            RandomAccessFile rFile = new RandomAccessFile(file, "r");
-            int size = (int) rFile.length();
-            FileChannel inChannel = rFile.getChannel();
-            ByteBuffer buf_in = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
-            while (buf_in.hasRemaining()) {
-                inChannel.read(buf_in);
-            }
-            buf_in.flip();
-            FloatBuffer fb = buf_in.asFloatBuffer();
-            num = fb.remaining() / 2;
-            fb.get(verticesXY, 0, num * 2);
-            inChannel.close();
-            rFile.close();
-            pointIntersection = new PolygonPointIntersection(verticesXY, num);
-        } catch (IOException e) {
-            // just ignore everything :)
-        }
-    }
+    // void store(String file) {
+    // try {
+    // RandomAccessFile rFile = new RandomAccessFile(file, "rw");
+    // rFile.setLength(0);
+    // FileChannel inChannel = rFile.getChannel();
+    // ByteBuffer buf_in = ByteBuffer.allocateDirect(num * 2 * 4).order(ByteOrder.nativeOrder());
+    // FloatBuffer fb = buf_in.asFloatBuffer();
+    // fb.put(verticesXY, 0, num * 2);
+    // while (buf_in.hasRemaining()) {
+    // inChannel.write(buf_in);
+    // }
+    // inChannel.close();
+    // rFile.close();
+    // } catch (IOException e) {
+    // // just ignore everything :)
+    // }
+    // }
+    //
+    // void load(String file) {
+    // try {
+    // RandomAccessFile rFile = new RandomAccessFile(file, "r");
+    // int size = (int) rFile.length();
+    // FileChannel inChannel = rFile.getChannel();
+    // ByteBuffer buf_in = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
+    // while (buf_in.hasRemaining()) {
+    // inChannel.read(buf_in);
+    // }
+    // buf_in.flip();
+    // FloatBuffer fb = buf_in.asFloatBuffer();
+    // num = fb.remaining() / 2;
+    // fb.get(verticesXY, 0, num * 2);
+    // inChannel.close();
+    // rFile.close();
+    // pointIntersection = new PolygonPointIntersection(verticesXY, num);
+    // } catch (IOException e) {
+    // // just ignore everything :)
+    // }
+    // }
 
     void init() {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
@@ -114,10 +110,11 @@ public class PolygonDrawer {
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
         glfwWindowHint(GLFW_SAMPLES, 4);
 
-        System.out.println("Draw a polygon with holding the left mouse button down");
+        System.out.println("Draw polygons with holding the left mouse button down");
         System.out.println("Move the mouse cursor in and out of the polygon");
-        System.out.println("Press 'S' to load save the current polygon in file 'poly.gon'");
-        System.out.println("Press 'L' to load a previously saved polygon from file 'poly.gon'");
+        System.out.println("Press 'C' to load clear all polygons");
+        // System.out.println("Press 'S' to load save the current polygon in file 'poly.gon'");
+        // System.out.println("Press 'L' to load a previously saved polygon from file 'poly.gon'");
 
         window = glfwCreateWindow(width, height, "Polygon Demo", NULL, NULL);
         if (window == NULL)
@@ -131,9 +128,12 @@ public class PolygonDrawer {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                     glfwSetWindowShouldClose(window, GL_TRUE);
                 if (key == GLFW_KEY_L && action == GLFW_RELEASE) {
-                    load("poly.gon");
+                    // load("poly.gon");
                 } else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
-                    store("poly.gon");
+                    // store("poly.gon");
+                } else if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
+                    num = 0;
+                    polygons = new int[0];
                 }
             }
         });
@@ -166,13 +166,17 @@ public class PolygonDrawer {
         glfwSetMouseButtonCallback(window, mbCallback = new GLFWMouseButtonCallback() {
             @Override
             public void invoke(long window, int button, int action, int mods) {
-                if (action == GLFW_PRESS) {
+                if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT) {
                     down = true;
-                    num = 0;
                     inside = false;
-                } else if (action == GLFW_RELEASE) {
+                } else if (action == GLFW_RELEASE && button == GLFW_MOUSE_BUTTON_LEFT) {
                     down = false;
-                    pointIntersection = new PolygonPointIntersection(verticesXY, num);
+                    first = num;
+                    int[] newPolygons = new int[polygons.length + 1];
+                    System.arraycopy(polygons, 0, newPolygons, 0, polygons.length);
+                    newPolygons[polygons.length] = num;
+                    polygons = newPolygons;
+                    pointIntersection = new PolygonPointIntersection(verticesXY, polygons, num);
                 }
             }
         });
@@ -190,18 +194,28 @@ public class PolygonDrawer {
         glfwShowWindow(window);
 
         // auto-restore last autosave
-        load("autopoly.gon");
+        // load("autopoly.gon");
     }
 
     void renderPolygon() {
         glBegin(GL_LINE_STRIP);
         if (num > 0) {
+            int curr = 0;
+            int first = 0;
             for (int i = 0; i < num; i++) {
-                if (i == num - 1 && down)
+                if ((i == (num - 1)) && down)
                     glColor3f(0.8f, 0.8f, 0.8f);
+                if (polygons.length > curr && polygons[curr] == i) {
+                    // close current polygon
+                    glVertex2f(verticesXY[2 * first + 0], verticesXY[2 * first + 1]);
+                    first = i;
+                    curr++;
+                    glEnd();
+                    glBegin(GL_LINE_STRIP);
+                }
                 glVertex2f(verticesXY[2 * i + 0], verticesXY[2 * i + 1]);
             }
-            glVertex2f(verticesXY[0], verticesXY[1]);
+            glVertex2f(verticesXY[2 * first + 0], verticesXY[2 * first + 1]);
         }
         glEnd();
     }
@@ -233,7 +247,7 @@ public class PolygonDrawer {
         }
 
         // autosave current polygon
-        store("autopoly.gon");
+        // store("autopoly.gon");
     }
 
     public static void main(String[] args) {
