@@ -39,7 +39,7 @@ public class PolygonDrawer {
     boolean down;
     float[] verticesXY = new float[1024 * 1024];
     int[] polygons = new int[0];
-    PolygonPointIntersection pointIntersection = new PolygonPointIntersection(verticesXY, polygons, 0);
+    PolygonPointIntersection pointIntersection;
     int first = 0;
     int num = 0;
     boolean inside;
@@ -205,8 +205,35 @@ public class PolygonDrawer {
         glfwSwapInterval(0);
         glfwShowWindow(window);
 
+        warmup();
+        updateStats();
+
         // auto-restore last autosave
         // load("autopoly.gon");
+    }
+
+    void warmup() {
+        glfwSetWindowTitle(window, "Warming up...");
+        glfwPollEvents();
+        // Warmup polygon
+        int warmupCount = 1024 * 64;
+        float[] warmupVertices = new float[warmupCount * 2];
+        for (int i = 0; i < warmupCount; i++) {
+            warmupVertices[2*i+0] = ((float)Math.cos((float)i/warmupCount) - 0.5f) * 2.0f;
+            warmupVertices[2*i+1] = ((float)Math.cos((float)i/warmupCount) - 0.5f) * 2.0f;
+        }
+        pointIntersection = new PolygonPointIntersection(warmupVertices, new int[0], warmupCount);
+        int warmupIterations = 1024 * 1024 * 8;
+        float[] warmupSamples = new float[256];
+        for (int i = 0; i < warmupSamples.length; i++) {
+            warmupSamples[i] = ((float)Math.random() - 0.5f);
+        }
+        for (int i = 0; i < warmupIterations; i++) {
+            float x = warmupSamples[i%256];
+            float y = warmupSamples[(i+1)%256];
+            pointIntersection.pointInPolygon(x, y);
+        }
+        pointIntersection = new PolygonPointIntersection(verticesXY, new int[0], 0);
     }
 
     void renderPolygon() {
