@@ -14,7 +14,6 @@ import java.nio.IntBuffer;
 import java.nio.channels.FileChannel;
 
 import org.joml.PolygonPointIntersection;
-import org.joml.PolygonPointIntersection.Interval;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
@@ -39,7 +38,6 @@ public class PolygonDrawer {
     GLFWCursorPosCallback cpCallback;
     GLFWMouseButtonCallback mbCallback;
     PolygonPointIntersection pointIntersection;
-    Interval[] working;
 
     long window;
     int width = 800;
@@ -109,7 +107,6 @@ public class PolygonDrawer {
                         inChannel.close();
                         rFile.close();
                         pointIntersection = new PolygonPointIntersection(verticesXY, num);
-                        working = new Interval[pointIntersection.workingSize()];
                     } catch (IOException e) {
                         // just ignore everything :)
                     }
@@ -152,7 +149,7 @@ public class PolygonDrawer {
                     num++;
                 } else {
                     if (pointIntersection != null)
-                        inside = pointIntersection.pointInPolygon(x, y, working);
+                        inside = pointIntersection.pointInPolygon(x, y);
                     else
                         inside = false;
                 }
@@ -168,7 +165,6 @@ public class PolygonDrawer {
                 } else if (action == GLFW_RELEASE) {
                     down = false;
                     pointIntersection = new PolygonPointIntersection(verticesXY, num);
-                    working = new Interval[pointIntersection.workingSize()];
                 }
             }
         });
