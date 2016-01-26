@@ -6,6 +6,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memAddress;
 
 import java.nio.IntBuffer;
+import java.util.BitSet;
 
 import org.joml.PolygonPointIntersection;
 import org.lwjgl.BufferUtils;
@@ -40,10 +41,12 @@ public class PolygonDrawer {
     float[] verticesXY = new float[1024 * 1024];
     int[] polygons = new int[0];
     PolygonPointIntersection pointIntersection;
+    BitSet hitPolygons = new BitSet();
     int first = 0;
     int num = 0;
     boolean inside;
     int querymicroseconds = 0;
+    int hitPolygonIndex = -1;
 
     void run() {
         try {
@@ -165,7 +168,10 @@ public class PolygonDrawer {
                 } else {
                     if (pointIntersection != null) {
                         long time1 = System.nanoTime();
-                        inside = pointIntersection.pointInPolygon(x, y);
+                        inside = pointIntersection.pointInPolygons(x, y, hitPolygons);
+                        if (inside) {
+                            hitPolygonIndex = hitPolygons.nextSetBit(0);
+                        }
                         long time2 = System.nanoTime();
                         querymicroseconds = (int) ((time2 - time1) / 1E3);
                         updateStats();
@@ -231,7 +237,7 @@ public class PolygonDrawer {
         for (int i = 0; i < warmupIterations; i++) {
             float x = warmupSamples[i%256];
             float y = warmupSamples[(i+1)%256];
-            pointIntersection.pointInPolygon(x, y);
+            pointIntersection.pointInPolygons(x, y);
         }
         pointIntersection = new PolygonPointIntersection(verticesXY, new int[0], 0);
     }
@@ -242,6 +248,10 @@ public class PolygonDrawer {
             int curr = 0;
             int first = 0;
             for (int i = 0; i < num; i++) {
+                if (inside && curr == hitPolygonIndex)
+                    glColor3f(1.0f, 0.3f, 0.3f);
+                else
+                    glColor3f(0.01f, 0.01f, 0.01f);
                 if ((i == (num - 1)) && down)
                     glColor3f(0.8f, 0.8f, 0.8f);
                 if (polygons.length > curr && polygons[curr] == i) {
@@ -251,6 +261,10 @@ public class PolygonDrawer {
                     curr++;
                     glEnd();
                     glBegin(GL_LINE_STRIP);
+                    if (inside && curr == hitPolygonIndex)
+                        glColor3f(1.0f, 0.3f, 0.3f);
+                    else
+                        glColor3f(0.01f, 0.01f, 0.01f);
                 }
                 glVertex2f(verticesXY[2 * i + 0], verticesXY[2 * i + 1]);
             }
@@ -275,10 +289,6 @@ public class PolygonDrawer {
             glMatrixMode(GL_MODELVIEW);
             glLoadIdentity();
 
-            if (inside)
-                glColor3f(1.0f, 0.3f, 0.3f);
-            else
-                glColor3f(0.01f, 0.01f, 0.01f);
             renderPolygon();
 
             glfwSwapBuffers(window);
