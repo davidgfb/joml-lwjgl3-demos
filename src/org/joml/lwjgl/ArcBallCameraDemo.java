@@ -63,6 +63,7 @@ public class ArcBallCameraDemo {
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
+        System.out.println("Press ENTER to randomly reposition the cube on the grid.");
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
