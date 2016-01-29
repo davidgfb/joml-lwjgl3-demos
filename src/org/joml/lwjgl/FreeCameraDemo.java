@@ -211,9 +211,8 @@ public class FreeCameraDemo {
             /*
              * Obtain the camera's view matrix
              */
-            cam.apply(mat.identity()).get(fb);
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(cam.apply(mat.identity()).get(fb));
 
             renderGrid();
             renderCube();
