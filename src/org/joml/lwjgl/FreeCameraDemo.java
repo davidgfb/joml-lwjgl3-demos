@@ -8,6 +8,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.camera.FreeCamera;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
@@ -168,6 +169,7 @@ public class FreeCameraDemo {
         // Remember the current time.
         long lastTime = System.nanoTime();
 
+        Vector3f tmp = new Vector3f();
         Matrix4f mat = new Matrix4f();
         // FloatBuffer for transferring matrices to OpenGL
         FloatBuffer fb = BufferUtils.createFloatBuffer(16);
@@ -178,21 +180,21 @@ public class FreeCameraDemo {
             float accFactor = 6.0f;
             float rotateZ = 0.0f;
             if (keyDown[GLFW_KEY_W])
-                cam.linearAcc.fma(accFactor, cam.forward);
+                cam.linearAcc.fma(accFactor, cam.forward(tmp));
             if (keyDown[GLFW_KEY_S])
-                cam.linearAcc.fma(-accFactor, cam.forward);
+                cam.linearAcc.fma(-accFactor, cam.forward(tmp));
             if (keyDown[GLFW_KEY_D])
-                cam.linearAcc.fma(accFactor, cam.right);
+                cam.linearAcc.fma(accFactor, cam.right(tmp));
             if (keyDown[GLFW_KEY_A])
-                cam.linearAcc.fma(-accFactor, cam.right);
+                cam.linearAcc.fma(-accFactor, cam.right(tmp));
             if (keyDown[GLFW_KEY_Q])
-                rotateZ += 1.0f;
-            if (keyDown[GLFW_KEY_E])
                 rotateZ -= 1.0f;
+            if (keyDown[GLFW_KEY_E])
+                rotateZ += 1.0f;
             if (keyDown[GLFW_KEY_SPACE])
-                cam.linearAcc.fma(accFactor, cam.up);
+                cam.linearAcc.fma(accFactor, cam.up(tmp));
             if (keyDown[GLFW_KEY_LEFT_CONTROL])
-                cam.linearAcc.fma(-accFactor, cam.up);
+                cam.linearAcc.fma(-accFactor, cam.up(tmp));
             cam.angularVel.set(mouseY, mouseX, rotateZ);
 
             /* Compute delta time */
