@@ -8,7 +8,7 @@ import static org.lwjgl.system.MemoryUtil.memAddress;
 import java.nio.IntBuffer;
 import java.util.BitSet;
 
-import org.joml.PolygonPointIntersection;
+import org.joml.PolygonsIntersection;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
@@ -21,7 +21,7 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 /**
- * This demo showcases the {@link PolygonPointIntersection} algorithm. The outlines of a polygon can be drawn with the mouse and an intersection test is
+ * This demo showcases the {@link PolygonsIntersection} algorithm. The outlines of a polygon can be drawn with the mouse and an intersection test is
  * performed on every mouse movement to color the polygon in red if the mouse cursor is inside; or black if not.
  * 
  * @author Kai Burjack
@@ -40,7 +40,7 @@ public class PolygonDrawer {
     boolean down;
     float[] verticesXY = new float[1024 * 1024];
     int[] polygons = new int[0];
-    PolygonPointIntersection pointIntersection;
+    PolygonsIntersection pointIntersection;
     BitSet hitPolygons = new BitSet();
     int first = 0;
     int num = 0;
@@ -168,7 +168,7 @@ public class PolygonDrawer {
                 } else {
                     if (pointIntersection != null) {
                         long time1 = System.nanoTime();
-                        inside = pointIntersection.pointInPolygons(x, y, hitPolygons);
+                        inside = pointIntersection.testPoint(x, y, hitPolygons);
                         if (inside) {
                             hitPolygonIndex = hitPolygons.nextSetBit(0);
                         }
@@ -194,7 +194,7 @@ public class PolygonDrawer {
                     System.arraycopy(polygons, 0, newPolygons, 0, polygons.length);
                     newPolygons[polygons.length] = num;
                     polygons = newPolygons;
-                    pointIntersection = new PolygonPointIntersection(verticesXY, polygons, num);
+                    pointIntersection = new PolygonsIntersection(verticesXY, polygons, num);
                 }
             }
         });
@@ -228,7 +228,7 @@ public class PolygonDrawer {
             warmupVertices[2*i+0] = ((float)Math.cos((float)i/warmupCount) - 0.5f) * 2.0f;
             warmupVertices[2*i+1] = ((float)Math.cos((float)i/warmupCount) - 0.5f) * 2.0f;
         }
-        pointIntersection = new PolygonPointIntersection(warmupVertices, new int[0], warmupCount);
+        pointIntersection = new PolygonsIntersection(warmupVertices, new int[0], warmupCount);
         int warmupIterations = 1024 * 1024 * 8;
         float[] warmupSamples = new float[256];
         for (int i = 0; i < warmupSamples.length; i++) {
@@ -237,9 +237,9 @@ public class PolygonDrawer {
         for (int i = 0; i < warmupIterations; i++) {
             float x = warmupSamples[i%256];
             float y = warmupSamples[(i+1)%256];
-            pointIntersection.pointInPolygons(x, y);
+            pointIntersection.testPoint(x, y);
         }
-        pointIntersection = new PolygonPointIntersection(verticesXY, new int[0], 0);
+        pointIntersection = new PolygonsIntersection(verticesXY, new int[0], 0);
     }
 
     void renderPolygon() {

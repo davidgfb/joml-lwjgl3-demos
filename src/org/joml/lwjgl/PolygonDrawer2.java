@@ -10,7 +10,7 @@ import java.nio.IntBuffer;
 import java.util.BitSet;
 
 import org.joml.Matrix4f;
-import org.joml.PolygonPointIntersection;
+import org.joml.PolygonsIntersection;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
@@ -44,7 +44,7 @@ public class PolygonDrawer2 {
     boolean down;
     float[] verticesXY = new float[1024 * 1024];
     int[] polygons = new int[0];
-    PolygonPointIntersection pointIntersection;
+    PolygonsIntersection pointIntersection;
     BitSet hitPolygons = new BitSet();
     int num = 0;
     boolean inside;
@@ -79,7 +79,7 @@ public class PolygonDrawer2 {
         if (pointIntersection != null) {
             long time1 = System.nanoTime();
             transformationInv.transformPosition(p.set(x, y, 0));
-            inside = pointIntersection.pointInPolygons(p.x, p.y, hitPolygons);
+            inside = pointIntersection.testPoint(p.x, p.y, hitPolygons);
             if (inside) {
                 hitPolygonIndex = hitPolygons.nextSetBit(0);
             }
@@ -159,7 +159,7 @@ public class PolygonDrawer2 {
                     System.arraycopy(polygons, 0, newPolygons, 0, polygons.length);
                     newPolygons[polygons.length] = num;
                     polygons = newPolygons;
-                    pointIntersection = new PolygonPointIntersection(verticesXY, polygons, num);
+                    pointIntersection = new PolygonsIntersection(verticesXY, polygons, num);
                 }
             }
         });
@@ -190,7 +190,7 @@ public class PolygonDrawer2 {
             warmupVertices[2*i+0] = ((float)Math.cos((float)i/warmupCount) - 0.5f) * 2.0f;
             warmupVertices[2*i+1] = ((float)Math.cos((float)i/warmupCount) - 0.5f) * 2.0f;
         }
-        pointIntersection = new PolygonPointIntersection(warmupVertices, new int[0], warmupCount);
+        pointIntersection = new PolygonsIntersection(warmupVertices, new int[0], warmupCount);
         int warmupIterations = 1024 * 1024 * 8;
         float[] warmupSamples = new float[256];
         for (int i = 0; i < warmupSamples.length; i++) {
@@ -199,9 +199,9 @@ public class PolygonDrawer2 {
         for (int i = 0; i < warmupIterations; i++) {
             float x = warmupSamples[i%256];
             float y = warmupSamples[(i+1)%256];
-            pointIntersection.pointInPolygons(x, y);
+            pointIntersection.testPoint(x, y);
         }
-        pointIntersection = new PolygonPointIntersection(verticesXY, new int[0], 0);
+        pointIntersection = new PolygonsIntersection(verticesXY, new int[0], 0);
     }
 
     void renderPolygon() {
