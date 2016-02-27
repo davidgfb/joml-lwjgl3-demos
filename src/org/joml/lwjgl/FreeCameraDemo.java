@@ -37,12 +37,12 @@ public class FreeCameraDemo {
             loop();
 
             glfwDestroyWindow(window);
-            keyCallback.release();
-            fbCallback.release();
-            cpCallback.release();
+            keyCallback.free();
+            fbCallback.free();
+            cpCallback.free();
         } finally {
             glfwTerminate();
-            errorCallback.release();
+            errorCallback.free();
         }
     }
 

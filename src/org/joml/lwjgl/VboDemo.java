@@ -42,10 +42,10 @@ public class VboDemo {
             loop();
 
             glfwDestroyWindow(window);
-            keyCallback.release();
+            keyCallback.free();
         } finally {
             glfwTerminate();
-            errorCallback.release();
+            errorCallback.free();
         }
     }
 

@@ -36,11 +36,11 @@ public class ShaderExample {
                 destroyed = true;
                 glfwDestroyWindow(window);
             }
-            keyCallback.release();
-            fbCallback.release();
+            keyCallback.free();
+            fbCallback.free();
         } finally {
             glfwTerminate();
-            errorCallback.release();
+            errorCallback.free();
         }
     }
 

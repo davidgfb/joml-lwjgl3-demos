@@ -54,13 +54,13 @@ public class PolygonDrawer {
             loop();
 
             glfwDestroyWindow(window);
-            keyCallback.release();
-            fbCallback.release();
-            cpCallback.release();
-            mbCallback.release();
+            keyCallback.free();
+            fbCallback.free();
+            cpCallback.free();
+            mbCallback.free();
         } finally {
             glfwTerminate();
-            errorCallback.release();
+            errorCallback.free();
         }
     }
 

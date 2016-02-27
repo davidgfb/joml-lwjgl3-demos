@@ -46,14 +46,14 @@ public class ReflectDemo {
             loop();
 
             glfwDestroyWindow(window);
-            keyCallback.release();
-            fbCallback.release();
-            cpCallback.release();
-            sCallback.release();
-            mbCallback.release();
+            keyCallback.free();
+            fbCallback.free();
+            cpCallback.free();
+            sCallback.free();
+            mbCallback.free();
         } finally {
             glfwTerminate();
-            errorCallback.release();
+            errorCallback.free();
         }
     }
 
