@@ -193,12 +193,12 @@ public class ProjectiveShadowDemo {
             renderCube(false);
 
             // Render the plane on which to project the shadow
-            glLoadMatrixf(m.mul4x3(planeTransform, m2).get(fb));
+            glLoadMatrixf(m.mulAffine(planeTransform, m2).get(fb));
             renderPlane();
 
             // Render light bulb
             m2.rotationY(angle).translate(0, 0.8f, 2).transform(lightPos.set(0, 0, 0, 1));
-            glLoadMatrixf(m.mul4x3(m2, m2).get(fb));
+            glLoadMatrixf(m.mulAffine(m2, m2).get(fb));
             renderLight();
 
             // Render projected shadow of the cube
