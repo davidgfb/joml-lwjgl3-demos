@@ -50,13 +50,13 @@ public class ArcBallCameraDemo {
 
     void init() {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        if (glfwInit() != GL11.GL_TRUE)
+        if (glfwInit() != GLFW_TRUE)
             throw new IllegalStateException("Unable to initialize GLFW");
 
         // Configure our window
         glfwDefaultWindowHints();
-        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_SAMPLES, 4);
 
         window = glfwCreateWindow(width, height, "Hello ArcBall Camera!", NULL, NULL);
@@ -68,7 +68,7 @@ public class ArcBallCameraDemo {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                    glfwSetWindowShouldClose(window, GL_TRUE);
+                    glfwSetWindowShouldClose(window, GLFW_TRUE);
 
                 if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
                     cam.center((float) Math.random() * 20.0f - 10.0f, 0.0f, (float) Math.random() * 20.0f - 10.0f);
@@ -193,7 +193,7 @@ public class ArcBallCameraDemo {
         cam.setAlpha((float) Math.toRadians(-20));
         cam.setBeta((float) Math.toRadians(20));
 
-        while (glfwWindowShouldClose(window) == GL_FALSE) {
+        while (glfwWindowShouldClose(window) == GLFW_FALSE) {
             /* Set input values for the camera */
             if (down) {
                 cam.setAlpha(cam.getAlpha() + Math.toRadians((x - mouseX) * 0.1f));

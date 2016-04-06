@@ -20,7 +20,6 @@ import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
 
 public class BillboardDemo {
     GLFWErrorCallback errorCallback;
@@ -78,13 +77,13 @@ public class BillboardDemo {
         resetBoxes();
 
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        if (glfwInit() != GL11.GL_TRUE)
+        if (glfwInit() != GLFW_TRUE)
             throw new IllegalStateException("Unable to initialize GLFW");
 
         // Configure our window
         glfwDefaultWindowHints();
-        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_SAMPLES, 4);
 
         window = glfwCreateWindow(width, height, "Hello Billboard!", NULL, NULL);
@@ -99,7 +98,7 @@ public class BillboardDemo {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                    glfwSetWindowShouldClose(window, GL_TRUE);
+                    glfwSetWindowShouldClose(window, GLFW_TRUE);
 
                 if (key == GLFW_KEY_R && action == GLFW_PRESS) {
                     resetBoxes();
@@ -251,7 +250,7 @@ public class BillboardDemo {
         cam.setAlpha((float) Math.toRadians(-20));
         cam.setBeta((float) Math.toRadians(20));
 
-        while (glfwWindowShouldClose(window) == GL_FALSE) {
+        while (glfwWindowShouldClose(window) == GLFW_FALSE) {
             /* Set input values for the camera */
             if (down) {
                 cam.setAlpha(cam.getAlpha() + Math.toRadians((x - mouseX) * 0.1f));
