@@ -114,7 +114,7 @@ public class CoordinateSystemDemo {
                 if (yoffset > 0.0) {
                     scale = 1.1f;
                 } else if (yoffset < 0.0) {
-                    scale = 0.9f;
+                    scale = 1.0f / 1.1f;
                 }
                 tmp.scaling(scale).mulAffine(viewMatrix, viewMatrix);
             }
