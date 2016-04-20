@@ -151,8 +151,8 @@ public class CoordinateSystemDemo {
         maxX = Float.NEGATIVE_INFINITY;
         maxY = Float.NEGATIVE_INFINITY;
         for (int i = 0; i < 4; i++) {
-            float x = ((i % 2) << 1) - 1.0f;
-            float y = (((i >>> 1) % 2) << 1) - 1.0f;
+            float x = ((i & 1) << 1) - 1.0f;
+            float y = (((i >>> 1) & 1) << 1) - 1.0f;
             invViewProj.transformPosition(v.set(x, y, 0));
             minX = minX < v.x ? minX : v.x;
             minY = minY < v.y ? minY : v.y;
@@ -214,7 +214,7 @@ public class CoordinateSystemDemo {
             glfwPollEvents();
             glViewport(0, 0, width, height);
             float aspect = (float) width / height;
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT);
             projMatrix.identity().ortho2D(-aspect, +aspect, -1, +1);
             invViewProj.set(projMatrix).mulAffine(viewMatrix).invertAffine(invViewProj);
             if (!translate && !rotate)
