@@ -9,7 +9,9 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 
+import org.joml.Intersectionf;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
@@ -30,8 +32,8 @@ public class CoordinateSystemDemo {
     GLFWScrollCallback sCallback;
 
     long window;
-    int width = 300;
-    int height = 300;
+    int width = 1024;
+    int height = 768;
 
     float minX, minY;
     float maxX, maxY;
@@ -45,7 +47,11 @@ public class CoordinateSystemDemo {
     Matrix4f tmp = new Matrix4f();
     FloatBuffer fb = BufferUtils.createFloatBuffer(16);
     Vector3f v = new Vector3f();
+    Vector3f v2 = new Vector3f();
+    Vector2f p = new Vector2f();
     ByteBuffer charBuffer = BufferUtils.createByteBuffer(32 * 270);
+    float textScale = 2.6f;
+    float maxTicks = 17.0f;
 
     DecimalFormat frmt = new DecimalFormat("0.###");
 
@@ -76,6 +82,7 @@ public class CoordinateSystemDemo {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_SAMPLES, 4);
         window = glfwCreateWindow(width, height, "Hello coordinate system!", NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
@@ -203,21 +210,29 @@ public class CoordinateSystemDemo {
         return magMsd * magPow;
     }
 
+    float diagonal() {
+        invViewProj.transformPosition(v.set(-1, -1, 0));
+        float x = v.x, y = v.y;
+        invViewProj.transformPosition(v.set(+1, +1, 0));
+        float x2 = v.x, y2 = v.y;
+        return (float) Math.sqrt((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y));
+    }
+
     void renderGrid() {
         glColor3f(0.5f, 0.5f, 0.5f);
         glEnable(GL_LINE_STIPPLE);
         glLineStipple(1, (short) 0x8888);
         glBegin(GL_LINES);
-        float subticks = tick(Math.min(maxX - minX, maxY - minY), 12.0f);
+        float ticks = tick(diagonal(), maxTicks);
         float sx = stippleOffsetX(16);
         float sy = stippleOffsetY(16);
-        float startX = subticks * (float) Math.floor(minX / subticks);
-        for (float x = startX; x <= maxX; x += subticks) {
+        float startX = ticks * (float) Math.floor(minX / ticks);
+        for (float x = startX; x <= maxX; x += ticks) {
             glVertex2f(x, minY - sy);
             glVertex2f(x, maxY + sy);
         }
-        float startY = subticks * (float) Math.floor(minY / subticks);
-        for (float y = startY; y <= maxY; y += subticks) {
+        float startY = ticks * (float) Math.floor(minY / ticks);
+        for (float y = startY; y <= maxY; y += ticks) {
             glVertex2f(minX - sx, y);
             glVertex2f(maxX + sx, y);
         }
@@ -225,6 +240,7 @@ public class CoordinateSystemDemo {
         glDisable(GL_LINE_STIPPLE);
 
         // Main axes
+        glLineWidth(1.5f);
         glBegin(GL_LINES);
         glColor3f(0.5f, 0.2f, 0.2f);
         glVertex2f(minX, 0);
@@ -233,17 +249,56 @@ public class CoordinateSystemDemo {
         glVertex2f(0, minY);
         glVertex2f(0, maxY);
         glEnd();
+        glLineWidth(1.0f);
 
         // unit square
         glColor3f(0.2f, 0.4f, 0.6f);
+        glLineWidth(1.7f);
         glBegin(GL_LINES);
         for (int i = -1; i <= +1; i++) {
+            if (i == 0)
+                continue;
             glVertex2f(i, -1);
             glVertex2f(i, +1);
             glVertex2f(-1, i);
             glVertex2f(+1, i);
         }
         glEnd();
+        glLineWidth(1.0f);
+    }
+
+    boolean snapX(float edge, float x2, float y2, float x3, float y3) {
+        invViewProj.transformPosition(v2.set(edge, +1, 0));
+        float x0 = v2.x, y0 = v2.y;
+        invViewProj.transformPosition(v2.set(edge, -1, 0));
+        float x1 = v2.x, y1 = v2.y;
+        if (Intersectionf.intersectLineLine(x0, y0, x1, y1, x2, y2, x3, y3, p)) {
+            viewProjMatrix.transformPosition(v2.set(p.x, p.y, 0));
+            return v2.x >= -1.1f && v2.y >= -1.1f && v2.x <= 1.1f && v2.y <= 1.1f;
+        }
+        return false;
+    }
+
+    boolean snapY(float edge, float x2, float y2, float x3, float y3) {
+        invViewProj.transformPosition(v2.set(-1, edge, 0));
+        float x0 = v2.x, y0 = v2.y;
+        invViewProj.transformPosition(v2.set(+1, edge, 0));
+        float x1 = v2.x, y1 = v2.y;
+        if (Intersectionf.intersectLineLine(x0, y0, x1, y1, x2, y2, x3, y3, p)) {
+            viewProjMatrix.transformPosition(v2.set(p.x, p.y, 0));
+            return v2.x >= -1.1f && v2.y >= -1.1f && v2.x <= 1.1f && v2.y <= 1.1f;
+        }
+        return false;
+    }
+
+    float textWidth(String text) {
+        int c = text.length();
+        float pxPerChar = 5 * textScale;
+        return c * pxPerChar / width;
+    }
+
+    float textHeight() {
+        return 8 * textScale / height;
     }
 
     void renderTickLabels() {
@@ -254,31 +309,73 @@ public class CoordinateSystemDemo {
         glLoadIdentity();
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
-        glLoadIdentity();
-    	float subticks = tick(Math.min(maxX - minX, maxY - minY), 12.0f);
+    	float subticks = tick(diagonal(), maxTicks);
         float startX = subticks * (float) Math.floor(minX / subticks);
-        glColor3f(0.3f, 0.3f, 0.3f);
         for (float x = startX; x <= maxX; x += subticks) {
         	if (Math.abs(x) < 1E-5f)
         		continue;
-        	glLoadIdentity();
+        	String text = frmt.format(x);
+        	float textWidth = textWidth(text);
+        	float textHeight = textHeight();
         	viewProjMatrix.transformPosition(v.set(x, 0, 0));
+        	if (v.x < -1 && snapX(-1, x, -1, x, +1)) {
+        	    glColor3f(0.5f, 0.3f, 0.3f);
+        	    v.set(v2);
+        	    v.x += 4.0f / width;
+        	} else if (v.x > +1 && snapX(+1, x, -1, x, +1)) {
+        	    glColor3f(0.5f, 0.3f, 0.3f);
+        	    v.set(v2);
+        	    v.x -= textWidth + 4.0f / width;
+        	} else if (v.y < -1 && snapY(-1, x, -1, x, +1)) {
+        	    glColor3f(0.5f, 0.3f, 0.3f);
+                v.set(v2);
+                v.y += textHeight + 4.0f / height;
+            } else if (v.y > +1 && snapY(+1, x, -1, x, +1)) {
+                glColor3f(0.5f, 0.3f, 0.3f);
+                v.set(v2);
+                v.y -= 4.0f / height;
+        	} else {
+        	    glColor3f(0.3f, 0.3f, 0.3f);
+        	}
+        	glLoadIdentity();
         	glTranslatef(v.x, v.y, 0);
-        	glScalef(2.0f / width, -2.0f / height, 0.0f);
-        	glTranslatef(2, 3, 0);
-        	int quads = stb_easy_font_print(0, 0, frmt.format(x), null, charBuffer);
+        	glScalef(textScale / width, -textScale / height, 0.0f);
+        	int quads = stb_easy_font_print(0, 0, text, null, charBuffer);
             glDrawArrays(GL_QUADS, 0, quads * 4);
         }
         float startY = subticks * (float) Math.floor(minY / subticks);
         for (float y = startY; y <= maxY; y += subticks) {
         	if (Math.abs(y) < 1E-5f)
         		continue;
+            String text = frmt.format(y);
+            float textWidth = textWidth(text);
+            float textHeight = textHeight();
+            viewProjMatrix.transformPosition(v.set(0, y, 0));
+            if (v.y < -1 && snapY(-1, -1, y, +1, y)) {
+                glColor3f(0.3f, 0.5f, 0.3f);
+                v.set(v2);
+                v.y += textHeight + 4.0f / height;
+            } else if (v.y > +1 && snapY(+1, -1, y, +1, y)) {
+                glColor3f(0.3f, 0.5f, 0.3f);
+                v.set(v2);
+                v.y -= 4.0f / height;
+            } else if (v.x < -1 && snapX(-1, -1, y, +1, y)) {
+                glColor3f(0.3f, 0.5f, 0.3f);
+                v.set(v2);
+                v.x += 4.0f / width;
+            } else if (v.x > +1 && snapX(+1, -1, y, +1, y)) {
+                glColor3f(0.3f, 0.5f, 0.3f);
+                v.set(v2);
+                v.x -= textWidth + 4.0f / width;
+            } else {
+                v.x += 4.0f / width;
+                v.y -= 4.0f / height;
+                glColor3f(0.3f, 0.3f, 0.3f);
+            }
         	glLoadIdentity();
-        	viewProjMatrix.transformPosition(v.set(0, y, 0));
         	glTranslatef(v.x, v.y, 0);
-        	glScalef(2.0f / width, -2.0f / height, 0.0f);
-        	glTranslatef(3, 2, 0);
-        	int quads = stb_easy_font_print(0, 0, frmt.format(y), null, charBuffer);
+        	glScalef(textScale / width, -textScale / height, 0.0f);
+        	int quads = stb_easy_font_print(0, 0, text, null, charBuffer);
             glDrawArrays(GL_QUADS, 0, quads * 4);
         }
         glDisableClientState(GL_VERTEX_ARRAY);
@@ -302,7 +399,7 @@ public class CoordinateSystemDemo {
         float ndcY = (viewport[3]-oldMouseY-viewport[1])/viewport[3]*2.0f-1.0f;
         glTranslatef(ndcX, ndcY, 0);
         int quads = stb_easy_font_print(0, 0, str, null, charBuffer);
-        glScalef(2.0f / width, -2.0f / height, 0.0f);
+        glScalef(textScale / width, -textScale / height, 0.0f);
         glTranslatef(5, -15, 0);
         glColor3f(0.3f, 0.3f, 0.3f);
         glDrawArrays(GL_QUADS, 0, quads * 4);
