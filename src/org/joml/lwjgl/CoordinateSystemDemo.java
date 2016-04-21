@@ -300,7 +300,7 @@ public class CoordinateSystemDemo {
 
     float textWidth(String text) {
         int c = text.length();
-        float pxPerChar = 5 * textScale;
+        float pxPerChar = 5.5f * textScale;
         return c * pxPerChar / width;
     }
 
