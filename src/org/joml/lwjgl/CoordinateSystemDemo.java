@@ -139,6 +139,12 @@ public class CoordinateSystemDemo {
                 } else if (action == GLFW_RELEASE) {
                     translate = false;
                     rotate = false;
+                } else if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_MIDDLE) {
+                	viewMatrix.positiveX(v);
+                	float xx = v.x, xy = v.y;
+                	viewMatrix.positiveY(v);
+                	float yx = v.x, yy = v.y;
+                	tmp.set(xx, xy, 0, 0, yx, yy, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1).mul(viewMatrix, viewMatrix);
                 }
             }
         });
@@ -222,6 +228,16 @@ public class CoordinateSystemDemo {
         }
         glEnd();
         glDisable(GL_LINE_STIPPLE);
+
+        // Main axes
+        glBegin(GL_LINES);
+        glColor3f(0.5f, 0.2f, 0.2f);
+        glVertex2f(minX, 0);
+        glVertex2f(maxX, 0);
+        glColor3f(0.2f, 0.5f, 0.2f);
+        glVertex2f(0, minY);
+        glVertex2f(0, maxY);
+        glEnd();
 
         // unit square
         glColor3f(0.2f, 0.4f, 0.6f);
