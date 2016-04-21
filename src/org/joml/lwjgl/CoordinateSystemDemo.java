@@ -3,7 +3,7 @@ package org.joml.lwjgl;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
-import static org.lwjgl.stb.STBEasyFont.stb_easy_font_print;
+import static org.lwjgl.stb.STBEasyFont.*;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -299,13 +299,11 @@ public class CoordinateSystemDemo {
     }
 
     float textWidth(String text) {
-        int c = text.length();
-        float pxPerChar = 5.5f * textScale;
-        return c * pxPerChar / width;
+        return stb_easy_font_width(text) * textScale / width;
     }
 
-    float textHeight() {
-        return 8 * textScale / height;
+    float textHeight(String text) {
+        return stb_easy_font_height(text) * textScale / height;
     }
 
     void renderTickLabels() {
@@ -323,7 +321,7 @@ public class CoordinateSystemDemo {
         		continue;
         	String text = frmt.format(x);
         	float textWidth = textWidth(text);
-        	float textHeight = textHeight();
+        	float textHeight = textHeight(text);
         	viewProjMatrix.transformPosition(v.set(x, 0, 0));
         	if (v.x < -1 && snapX(-1, x, -1, x, +1)) {
         	    glColor3f(0.5f, 0.3f, 0.3f);
@@ -336,7 +334,7 @@ public class CoordinateSystemDemo {
         	} else if (v.y < -1 && snapY(-1, x, -1, x, +1)) {
         	    glColor3f(0.5f, 0.3f, 0.3f);
                 v.set(v2);
-                v.y += textHeight + 4.0f / height;
+                v.y += textHeight * 0.8f;
             } else if (v.y > +1 && snapY(+1, x, -1, x, +1)) {
                 glColor3f(0.5f, 0.3f, 0.3f);
                 v.set(v2);
@@ -356,12 +354,12 @@ public class CoordinateSystemDemo {
         		continue;
             String text = frmt.format(y);
             float textWidth = textWidth(text);
-            float textHeight = textHeight();
+            float textHeight = textHeight(text);
             viewProjMatrix.transformPosition(v.set(0, y, 0));
             if (v.y < -1 && snapY(-1, -1, y, +1, y)) {
                 glColor3f(0.3f, 0.5f, 0.3f);
                 v.set(v2);
-                v.y += textHeight + 4.0f / height;
+                v.y += textHeight * 0.8f;
             } else if (v.y > +1 && snapY(+1, -1, y, +1, y)) {
                 glColor3f(0.3f, 0.5f, 0.3f);
                 v.set(v2);
