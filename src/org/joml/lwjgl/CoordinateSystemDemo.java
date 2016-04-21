@@ -3,8 +3,11 @@ package org.joml.lwjgl;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.stb.STBEasyFont.stb_easy_font_print;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.text.DecimalFormat;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -39,11 +42,13 @@ public class CoordinateSystemDemo {
     boolean rotate;
     Matrix4f projMatrix = new Matrix4f();
     Matrix4f viewMatrix = new Matrix4f();
+    Matrix4f viewProjMatrix = new Matrix4f();
     Matrix4f invViewProj = new Matrix4f();
     Matrix4f control = new Matrix4f();
     Matrix4f tmp = new Matrix4f();
     FloatBuffer fb = BufferUtils.createFloatBuffer(16);
     Vector3f v = new Vector3f();
+    ByteBuffer charBuffer = BufferUtils.createByteBuffer(32 * 270);
 
     void run() {
         try {
@@ -225,6 +230,32 @@ public class CoordinateSystemDemo {
             glVertex2f(+1, i);
         }
         glEnd();
+
+        // Render coordinate under mouse pointer
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(2, GL_FLOAT, 16, charBuffer);
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        DecimalFormat frmt = new DecimalFormat("0.###E0");
+        viewProjMatrix.set(projMatrix).mul(viewMatrix).unproject(v.set(mouseX, height - mouseY, 0), viewport, v);
+        String str = frmt.format(v.x) + "\n" + frmt.format(v.y);
+        float ndcX = (mouseX-viewport[0])/viewport[2]*2.0f-1.0f;
+        float ndcY = (viewport[3]-mouseY-viewport[1])/viewport[3]*2.0f-1.0f;
+        glLoadIdentity();
+        glTranslatef(ndcX, ndcY, 0);
+        int quads = stb_easy_font_print(0, 0, str, null, charBuffer);
+        glScalef(1.0f / 400.0f, -1.0f / 400.0f, 0.0f);
+        glTranslatef(5, -15, 0);
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glDrawArrays(GL_QUADS, 0, quads * 4);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
     }
 
     void loop() {
