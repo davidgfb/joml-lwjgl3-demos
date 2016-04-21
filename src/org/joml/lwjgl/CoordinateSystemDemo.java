@@ -35,16 +35,13 @@ public class CoordinateSystemDemo {
 
     float minX, minY;
     float maxX, maxY;
-    float lastMouseX, lastMouseY, lastMouseNX, lastMouseNY;
-    float mouseX, mouseY, mouseNX, mouseNY;
+    float oldMouseX, oldMouseY, oldMouseNX, oldMouseNY;
     int[] viewport = new int[4];
     boolean translate;
     boolean rotate;
-    Matrix4f projMatrix = new Matrix4f();
     Matrix4f viewMatrix = new Matrix4f();
     Matrix4f viewProjMatrix = new Matrix4f();
     Matrix4f invViewProj = new Matrix4f();
-    Matrix4f control = new Matrix4f();
     Matrix4f tmp = new Matrix4f();
     FloatBuffer fb = BufferUtils.createFloatBuffer(16);
     Vector3f v = new Vector3f();
@@ -68,7 +65,7 @@ public class CoordinateSystemDemo {
     void toWorld(float x, float y) {
         float nx = (float) x / width * 2.0f - 1.0f;
         float ny = (float) (height - y) / height * 2.0f - 1.0f;
-        control.transformPosition(v.set(nx, ny, 0.0f));
+        invViewProj.transformPosition(v.set(nx, ny, 0.0f));
     }
 
     void init() {
@@ -94,27 +91,27 @@ public class CoordinateSystemDemo {
         });
         glfwSetCursorPosCallback(window, cpCallback = new GLFWCursorPosCallback() {
             public void invoke(long window, double x, double y) {
-                mouseX = (float)x;
-                mouseY = (float)y;
+                float mouseX = (float)x;
+                float mouseY = (float)y;
                 float aspect = (float)width / height;
-                mouseNX = ((float) x / width * 2.0f - 1.0f) * aspect;
-                mouseNY = (float) (height - y) / height * 2.0f - 1.0f;
+                float mouseNX = ((float) x / width * 2.0f - 1.0f) * aspect;
+                float mouseNY = (float) (height - y) / height * 2.0f - 1.0f;
                 if (translate) {
                     toWorld(mouseX, mouseY);
                     float wx = v.x, wy = v.y;
-                    toWorld(lastMouseX, lastMouseY);
+                    toWorld(oldMouseX, oldMouseY);
                     float wx2 = v.x, wy2 = v.y;
                     float dx = wx - wx2;
                     float dy = wy - wy2;
                     viewMatrix.translate(dx, dy, 0);
                 } else if (rotate) {
-                    float angle = (float) Math.atan2(mouseNX * lastMouseNY - mouseNY * lastMouseNX, mouseNX * lastMouseNX + mouseNY * lastMouseNY);
+                    float angle = (float) Math.atan2(mouseNX * oldMouseNY - mouseNY * oldMouseNX, mouseNX * oldMouseNX + mouseNY * oldMouseNY);
                     tmp.rotationZ(-angle).mulAffine(viewMatrix, viewMatrix);
                 }
-                lastMouseX = mouseX;
-                lastMouseY = mouseY;
-                lastMouseNX = mouseNX;
-                lastMouseNY = mouseNY;
+                oldMouseX = mouseX;
+                oldMouseY = mouseY;
+                oldMouseNX = mouseNX;
+                oldMouseNY = mouseNY;
             }
         });
         glfwSetScrollCallback(window, sCallback = new GLFWScrollCallback() {
@@ -125,7 +122,7 @@ public class CoordinateSystemDemo {
                 } else if (yoffset < 0.0) {
                     scale = 1.0f / 1.2f;
                 }
-                tmp.translation(mouseNX, mouseNY, 0).scale(scale).translate(-mouseNX, -mouseNY, 0).mulAffine(viewMatrix, viewMatrix);
+                tmp.translation(oldMouseNX, oldMouseNY, 0).scale(scale).translate(-oldMouseNX, -oldMouseNY, 0).mulAffine(viewMatrix, viewMatrix);
             }
         });
         glfwSetMouseButtonCallback(window, mbCallback = new GLFWMouseButtonCallback() {
@@ -299,10 +296,10 @@ public class CoordinateSystemDemo {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        invViewProj.unprojectInv(v.set(mouseX, height - mouseY, 0), viewport, v);
+        invViewProj.unprojectInv(v.set(oldMouseX, height - oldMouseY, 0), viewport, v);
         String str = frmt.format(v.x) + "\n" + frmt.format(v.y);
-        float ndcX = (mouseX-viewport[0])/viewport[2]*2.0f-1.0f;
-        float ndcY = (viewport[3]-mouseY-viewport[1])/viewport[3]*2.0f-1.0f;
+        float ndcX = (oldMouseX-viewport[0])/viewport[2]*2.0f-1.0f;
+        float ndcY = (viewport[3]-oldMouseY-viewport[1])/viewport[3]*2.0f-1.0f;
         glTranslatef(ndcX, ndcY, 0);
         int quads = stb_easy_font_print(0, 0, str, null, charBuffer);
         glScalef(1.0f / 500.0f, -1.0f / 500.0f, 0.0f);
@@ -325,15 +322,10 @@ public class CoordinateSystemDemo {
             viewport[2] = width; viewport[3] = height;
             float aspect = (float) width / height;
             glClear(GL_COLOR_BUFFER_BIT);
-            projMatrix.identity().ortho2D(-aspect, +aspect, -1, +1);
-            viewProjMatrix.set(projMatrix).mulAffine(viewMatrix).invert(invViewProj);
-            if (!translate && !rotate)
-                control.set(invViewProj);
+            viewProjMatrix.identity().ortho2D(-aspect, +aspect, -1, +1).mulAffine(viewMatrix).invert(invViewProj);
             computeVisibleExtents();
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(projMatrix.get(fb));
-            glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(viewMatrix.get(fb));
+            glLoadMatrixf(viewProjMatrix.get(fb));
             renderGrid();
             renderTickLabels();
             renderMouseCursorCoordinates();
