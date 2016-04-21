@@ -101,8 +101,7 @@ public class CoordinateSystemDemo {
                     float wx = v.x, wy = v.y;
                     toWorld(oldMouseX, oldMouseY);
                     float wx2 = v.x, wy2 = v.y;
-                    float dx = wx - wx2;
-                    float dy = wy - wy2;
+                    float dx = wx - wx2, dy = wy - wy2;
                     viewMatrix.translate(dx, dy, 0);
                 } else if (rotate) {
                     float angle = (float) Math.atan2(mouseNX * oldMouseNY - mouseNY * oldMouseNX, mouseNX * oldMouseNX + mouseNY * oldMouseNY);
@@ -266,7 +265,7 @@ public class CoordinateSystemDemo {
         	glLoadIdentity();
         	viewProjMatrix.transformPosition(v.set(x, 0, 0));
         	glTranslatef(v.x, v.y, 0);
-        	glScalef(1.0f / 500.0f, -1.0f / 500.0f, 0.0f);
+        	glScalef(2.0f / width, -2.0f / height, 0.0f);
         	int quads = stb_easy_font_print(0, 0, frmt.format(x), null, charBuffer);
             glDrawArrays(GL_QUADS, 0, quads * 4);
         }
@@ -277,7 +276,7 @@ public class CoordinateSystemDemo {
         	glLoadIdentity();
         	viewProjMatrix.transformPosition(v.set(0, y, 0));
         	glTranslatef(v.x, v.y, 0);
-        	glScalef(1.0f / 500.0f, -1.0f / 500.0f, 0.0f);
+        	glScalef(2.0f / width, -2.0f / height, 0.0f);
         	int quads = stb_easy_font_print(0, 0, frmt.format(y), null, charBuffer);
             glDrawArrays(GL_QUADS, 0, quads * 4);
         }
@@ -302,7 +301,7 @@ public class CoordinateSystemDemo {
         float ndcY = (viewport[3]-oldMouseY-viewport[1])/viewport[3]*2.0f-1.0f;
         glTranslatef(ndcX, ndcY, 0);
         int quads = stb_easy_font_print(0, 0, str, null, charBuffer);
-        glScalef(1.0f / 500.0f, -1.0f / 500.0f, 0.0f);
+        glScalef(2.0f / width, -2.0f / height, 0.0f);
         glTranslatef(5, -15, 0);
         glColor3f(0.3f, 0.3f, 0.3f);
         glDrawArrays(GL_QUADS, 0, quads * 4);
