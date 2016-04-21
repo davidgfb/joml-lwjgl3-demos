@@ -96,7 +96,8 @@ public class CoordinateSystemDemo {
             public void invoke(long window, double x, double y) {
                 mouseX = (float)x;
                 mouseY = (float)y;
-                mouseNX = (float) x / width * 2.0f - 1.0f;
+                float aspect = (float)width / height;
+                mouseNX = ((float) x / width * 2.0f - 1.0f) * aspect;
                 mouseNY = (float) (height - y) / height * 2.0f - 1.0f;
                 if (translate) {
                     toWorld(mouseX, mouseY);
