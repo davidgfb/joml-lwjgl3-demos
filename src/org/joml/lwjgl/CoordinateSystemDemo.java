@@ -282,7 +282,7 @@ public class CoordinateSystemDemo {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        viewProjMatrix.set(projMatrix).mul(viewMatrix).unproject(v.set(mouseX, height - mouseY, 0), viewport, v);
+        invViewProj.unprojectInv(v.set(mouseX, height - mouseY, 0), viewport, v);
         String str = frmt.format(v.x) + "\n" + frmt.format(v.y);
         float ndcX = (mouseX-viewport[0])/viewport[2]*2.0f-1.0f;
         float ndcY = (viewport[3]-mouseY-viewport[1])/viewport[3]*2.0f-1.0f;
@@ -290,7 +290,7 @@ public class CoordinateSystemDemo {
         int quads = stb_easy_font_print(0, 0, str, null, charBuffer);
         glScalef(1.0f / 500.0f, -1.0f / 500.0f, 0.0f);
         glTranslatef(5, -15, 0);
-        glColor3f(0.0f, 0.0f, 0.0f);
+        glColor3f(0.3f, 0.3f, 0.3f);
         glDrawArrays(GL_QUADS, 0, quads * 4);
         glDisableClientState(GL_VERTEX_ARRAY);
         glPopMatrix();
@@ -309,7 +309,7 @@ public class CoordinateSystemDemo {
             float aspect = (float) width / height;
             glClear(GL_COLOR_BUFFER_BIT);
             projMatrix.identity().ortho2D(-aspect, +aspect, -1, +1);
-            invViewProj.set(projMatrix).mulAffine(viewMatrix).invertAffine(invViewProj);
+            viewProjMatrix.set(projMatrix).mulAffine(viewMatrix).invert(invViewProj);
             if (!translate && !rotate)
                 control.set(invViewProj);
             computeVisibleExtents();
