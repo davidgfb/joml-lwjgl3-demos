@@ -108,7 +108,7 @@ public class PolygonDrawer {
 
     void init() {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        if (glfwInit() != GLFW_TRUE)
+        if (!glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
 
         // Configure our window
@@ -133,7 +133,7 @@ public class PolygonDrawer {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                    glfwSetWindowShouldClose(window, GLFW_TRUE);
+                    glfwSetWindowShouldClose(window, true);
                 if (key == GLFW_KEY_L && action == GLFW_RELEASE) {
                     // load("poly.gon");
                 } else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
@@ -278,7 +278,7 @@ public class PolygonDrawer {
         glClearColor(0.99f, 0.99f, 0.99f, 1.0f);
         glLineWidth(1.8f);
 
-        while (glfwWindowShouldClose(window) == GLFW_FALSE) {
+        while (!glfwWindowShouldClose(window)) {
             glViewport(0, 0, width, height);
             glClear(GL_COLOR_BUFFER_BIT);
 

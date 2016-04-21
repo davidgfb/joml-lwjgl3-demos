@@ -46,7 +46,7 @@ public class ShaderExample {
 
     void init() {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        if (glfwInit() != GLFW_TRUE)
+        if (!glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
 
         glfwDefaultWindowHints();
@@ -62,7 +62,7 @@ public class ShaderExample {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                    glfwSetWindowShouldClose(window, GLFW_TRUE);
+                    glfwSetWindowShouldClose(window, true);
             }
         });
         glfwSetFramebufferSizeCallback(window, fbCallback = new GLFWFramebufferSizeCallback() {
@@ -224,7 +224,7 @@ public class ShaderExample {
         }).start();
 
         /* Process window messages in the main thread */
-        while (glfwWindowShouldClose(window) == GLFW_FALSE) {
+        while (!glfwWindowShouldClose(window)) {
             glfwWaitEvents();
         }
     }

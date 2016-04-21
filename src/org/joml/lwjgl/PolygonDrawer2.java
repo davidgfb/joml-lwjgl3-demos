@@ -92,7 +92,7 @@ public class PolygonDrawer2 {
 
     void init() {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        if (glfwInit() != GLFW_TRUE)
+        if (!glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
 
         // Configure our window
@@ -115,7 +115,7 @@ public class PolygonDrawer2 {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                    glfwSetWindowShouldClose(window, GLFW_TRUE);
+                    glfwSetWindowShouldClose(window, true);
                 else if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
                     num = 0;
                     polygons = new int[0];
@@ -243,7 +243,7 @@ public class PolygonDrawer2 {
 
         long lastTime = System.nanoTime();
 
-        while (glfwWindowShouldClose(window) == GLFW_FALSE) {
+        while (!glfwWindowShouldClose(window)) {
             long thisTime = System.nanoTime();
             float dt = (thisTime - lastTime) / 1E9f;
             lastTime = thisTime;

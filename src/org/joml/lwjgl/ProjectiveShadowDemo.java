@@ -39,7 +39,7 @@ public class ProjectiveShadowDemo {
 
     void init() {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        if (glfwInit() != GLFW_TRUE)
+        if (!glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
 
         // Configure our window
@@ -57,7 +57,7 @@ public class ProjectiveShadowDemo {
             public void invoke(long window, int key,
                     int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                    glfwSetWindowShouldClose(window, GLFW_TRUE);
+                    glfwSetWindowShouldClose(window, true);
             }
         });
         glfwSetFramebufferSizeCallback(window,
@@ -164,7 +164,7 @@ public class ProjectiveShadowDemo {
         // when we write stencil, we always replace the current value
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-        while ( glfwWindowShouldClose(window) == GLFW_FALSE ) {
+        while ( !glfwWindowShouldClose(window) ) {
             long thisTime = System.nanoTime();
             float diff = (thisTime - firstTime) / 1E9f;
             float angle = diff;

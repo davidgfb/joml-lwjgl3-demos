@@ -61,7 +61,7 @@ public class ReflectDemo {
 
     void init() {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        if (glfwInit() != GLFW_TRUE)
+        if (!glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
 
         // Configure our window
@@ -78,7 +78,7 @@ public class ReflectDemo {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                    glfwSetWindowShouldClose(window, GLFW_TRUE);
+                    glfwSetWindowShouldClose(window, true);
             }
         });
         glfwSetFramebufferSizeCallback(window, fbCallback = new GLFWFramebufferSizeCallback() {
@@ -231,7 +231,7 @@ public class ReflectDemo {
         /* Used to hold the reflection matrix */
         Matrix4f reflectMatrix = new Matrix4f();
 
-        while (glfwWindowShouldClose(window) == GLFW_FALSE) {
+        while (!glfwWindowShouldClose(window)) {
             /* Set input values for the camera */
             if (down) {
                 cam.setAlpha(cam.getAlpha() + Math.toRadians((x - mouseX) * 0.1f));

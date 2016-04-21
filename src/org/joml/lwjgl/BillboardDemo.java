@@ -77,7 +77,7 @@ public class BillboardDemo {
         resetBoxes();
 
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        if (glfwInit() != GLFW_TRUE)
+        if (!glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
 
         // Configure our window
@@ -98,7 +98,7 @@ public class BillboardDemo {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                    glfwSetWindowShouldClose(window, GLFW_TRUE);
+                    glfwSetWindowShouldClose(window, true);
 
                 if (key == GLFW_KEY_R && action == GLFW_PRESS) {
                     resetBoxes();
@@ -250,7 +250,7 @@ public class BillboardDemo {
         cam.setAlpha((float) Math.toRadians(-20));
         cam.setBeta((float) Math.toRadians(20));
 
-        while (glfwWindowShouldClose(window) == GLFW_FALSE) {
+        while (!glfwWindowShouldClose(window)) {
             /* Set input values for the camera */
             if (down) {
                 cam.setAlpha(cam.getAlpha() + Math.toRadians((x - mouseX) * 0.1f));

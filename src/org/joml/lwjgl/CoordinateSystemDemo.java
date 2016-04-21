@@ -65,7 +65,7 @@ public class CoordinateSystemDemo {
 
     void init() {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        if (glfwInit() != GLFW_TRUE)
+        if (!glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
         // Configure our window
         glfwDefaultWindowHints();
@@ -81,7 +81,7 @@ public class CoordinateSystemDemo {
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                    glfwSetWindowShouldClose(window, GLFW_TRUE);
+                    glfwSetWindowShouldClose(window, true);
             }
         });
         glfwSetCursorPosCallback(window, cpCallback = new GLFWCursorPosCallback() {
@@ -210,7 +210,7 @@ public class CoordinateSystemDemo {
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
         glClearColor(0.97f, 0.97f, 0.97f, 1.0f);
-        while (glfwWindowShouldClose(window) == GLFW_FALSE) {
+        while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
             glViewport(0, 0, width, height);
             float aspect = (float) width / height;

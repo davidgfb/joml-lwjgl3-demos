@@ -48,7 +48,7 @@ public class FreeCameraDemo {
 
     void init() {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        if (glfwInit() != GLFW_TRUE)
+        if (!glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
 
         // Configure our window
@@ -69,7 +69,7 @@ public class FreeCameraDemo {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                    glfwSetWindowShouldClose(window, GLFW_TRUE);
+                    glfwSetWindowShouldClose(window, true);
 
                 if (action == GLFW_PRESS || action == GLFW_REPEAT) {
                     keyDown[key] = true;
@@ -174,7 +174,7 @@ public class FreeCameraDemo {
         // FloatBuffer for transferring matrices to OpenGL
         FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 
-        while (glfwWindowShouldClose(window) == GLFW_FALSE) {
+        while (!glfwWindowShouldClose(window)) {
             // Update camera input
             cam.linearAcc.zero();
             float accFactor = 6.0f;
