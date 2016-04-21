@@ -50,6 +50,8 @@ public class CoordinateSystemDemo {
     Vector3f v = new Vector3f();
     ByteBuffer charBuffer = BufferUtils.createByteBuffer(32 * 270);
 
+    DecimalFormat frmt = new DecimalFormat("0.###");
+
     void run() {
         try {
             init();
@@ -118,9 +120,9 @@ public class CoordinateSystemDemo {
             public void invoke(long window, double xoffset, double yoffset) {
                 float scale = 1.0f;
                 if (yoffset > 0.0) {
-                    scale = 1.1f;
+                    scale = 1.2f;
                 } else if (yoffset < 0.0) {
-                    scale = 1.0f / 1.1f;
+                    scale = 1.0f / 1.2f;
                 }
                 tmp.scaling(scale).mulAffine(viewMatrix, viewMatrix);
             }
@@ -230,8 +232,48 @@ public class CoordinateSystemDemo {
             glVertex2f(+1, i);
         }
         glEnd();
+    }
 
-        // Render coordinate under mouse pointer
+    void renderTickLabels() {
+    	glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(2, GL_FLOAT, 16, charBuffer);
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+    	float subticks = tick(Math.min(maxX - minX, maxY - minY), 12.0f);
+        float startX = subticks * (float) Math.floor(minX / subticks);
+        glColor3f(0.3f, 0.3f, 0.3f);
+        for (float x = startX; x <= maxX; x += subticks) {
+        	if (Math.abs(x) < 1E-5f)
+        		continue;
+        	glLoadIdentity();
+        	viewProjMatrix.transformPosition(v.set(x, 0, 0));
+        	glTranslatef(v.x, v.y, 0);
+        	glScalef(1.0f / 500.0f, -1.0f / 500.0f, 0.0f);
+        	int quads = stb_easy_font_print(0, 0, frmt.format(x), null, charBuffer);
+            glDrawArrays(GL_QUADS, 0, quads * 4);
+        }
+        float startY = subticks * (float) Math.floor(minY / subticks);
+        for (float y = startY; y <= maxY; y += subticks) {
+        	if (Math.abs(y) < 1E-5f)
+        		continue;
+        	glLoadIdentity();
+        	viewProjMatrix.transformPosition(v.set(0, y, 0));
+        	glTranslatef(v.x, v.y, 0);
+        	glScalef(1.0f / 500.0f, -1.0f / 500.0f, 0.0f);
+        	int quads = stb_easy_font_print(0, 0, frmt.format(y), null, charBuffer);
+            glDrawArrays(GL_QUADS, 0, quads * 4);
+        }
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+    }
+
+    void renderMouseCursorCoordinates() {
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(2, GL_FLOAT, 16, charBuffer);
         glMatrixMode(GL_MODELVIEW);
@@ -240,15 +282,13 @@ public class CoordinateSystemDemo {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        DecimalFormat frmt = new DecimalFormat("0.###E0");
         viewProjMatrix.set(projMatrix).mul(viewMatrix).unproject(v.set(mouseX, height - mouseY, 0), viewport, v);
         String str = frmt.format(v.x) + "\n" + frmt.format(v.y);
         float ndcX = (mouseX-viewport[0])/viewport[2]*2.0f-1.0f;
         float ndcY = (viewport[3]-mouseY-viewport[1])/viewport[3]*2.0f-1.0f;
-        glLoadIdentity();
         glTranslatef(ndcX, ndcY, 0);
         int quads = stb_easy_font_print(0, 0, str, null, charBuffer);
-        glScalef(1.0f / 400.0f, -1.0f / 400.0f, 0.0f);
+        glScalef(1.0f / 500.0f, -1.0f / 500.0f, 0.0f);
         glTranslatef(5, -15, 0);
         glColor3f(0.0f, 0.0f, 0.0f);
         glDrawArrays(GL_QUADS, 0, quads * 4);
@@ -278,6 +318,8 @@ public class CoordinateSystemDemo {
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixf(viewMatrix.get(fb));
             renderGrid();
+            renderTickLabels();
+            renderMouseCursorCoordinates();
             glfwSwapBuffers(window);
         }
     }
