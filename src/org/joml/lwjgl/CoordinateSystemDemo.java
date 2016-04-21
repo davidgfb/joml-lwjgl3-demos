@@ -125,7 +125,7 @@ public class CoordinateSystemDemo {
                 } else if (yoffset < 0.0) {
                     scale = 1.0f / 1.2f;
                 }
-                tmp.scaling(scale).mulAffine(viewMatrix, viewMatrix);
+                tmp.translation(mouseNX, mouseNY, 0).scale(scale).translate(-mouseNX, -mouseNY, 0).mulAffine(viewMatrix, viewMatrix);
             }
         });
         glfwSetMouseButtonCallback(window, mbCallback = new GLFWMouseButtonCallback() {
