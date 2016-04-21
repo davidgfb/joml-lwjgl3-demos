@@ -127,7 +127,10 @@ public class CoordinateSystemDemo {
                 } else if (yoffset < 0.0) {
                     scale = 1.0f / 1.2f;
                 }
-                tmp.translation(oldMouseNX, oldMouseNY, 0).scale(scale).translate(-oldMouseNX, -oldMouseNY, 0).mulAffine(viewMatrix, viewMatrix);
+                tmp.translation(oldMouseNX, oldMouseNY, 0)
+                   .scale(scale)
+                   .translate(-oldMouseNX, -oldMouseNY, 0)
+                   .mulAffine(viewMatrix, viewMatrix);
             }
         });
         glfwSetMouseButtonCallback(window, mbCallback = new GLFWMouseButtonCallback() {
@@ -146,7 +149,11 @@ public class CoordinateSystemDemo {
                 	float xx = v.x, xy = v.y;
                 	viewMatrix.positiveY(v);
                 	float yx = v.x, yy = v.y;
-                	tmp.set(xx, xy, 0, 0, yx, yy, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1).mul(viewMatrix, viewMatrix);
+                	tmp.set(xx, xy, 0, 0,
+                	        yx, yy, 0, 0,
+                	        0,  0,  1, 0,
+                	        0,  0,  0, 1)
+                	   .mulAffine(viewMatrix, viewMatrix);
                 }
             }
         });
@@ -419,7 +426,9 @@ public class CoordinateSystemDemo {
             viewport[2] = width; viewport[3] = height;
             float aspect = (float) width / height;
             glClear(GL_COLOR_BUFFER_BIT);
-            viewProjMatrix.identity().ortho2D(-aspect, +aspect, -1, +1).mulAffine(viewMatrix).invert(invViewProj);
+            viewProjMatrix.setOrtho2D(-aspect, +aspect, -1, +1)
+                          .mulOrthoAffine(viewMatrix)
+                          .invertAffine(invViewProj);
             computeVisibleExtents();
             glMatrixMode(GL_PROJECTION);
             glLoadMatrixf(viewProjMatrix.get(fb));
