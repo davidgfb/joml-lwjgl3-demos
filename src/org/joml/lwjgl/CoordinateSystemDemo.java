@@ -34,6 +34,7 @@ public class CoordinateSystemDemo {
     float maxX, maxY;
     float lastMouseX, lastMouseY, lastMouseNX, lastMouseNY;
     float mouseX, mouseY, mouseNX, mouseNY;
+    int[] viewport = new int[4];
     boolean translate;
     boolean rotate;
     Matrix4f projMatrix = new Matrix4f();
@@ -161,6 +162,24 @@ public class CoordinateSystemDemo {
         }
     }
 
+    float stippleOffsetY(int width) {
+    	invViewProj.unprojectInv(v.set(0, 0, 0), viewport, v);
+    	float x0 = v.x, y0 = v.y;
+    	invViewProj.unprojectInv(v.set(0, width, 0), viewport, v);
+    	float x1 = v.x, y1 = v.y;
+    	float len = (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+    	return y0 % len - len * 0.25f;
+    }
+
+    float stippleOffsetX(int width) {
+    	invViewProj.unprojectInv(v.set(0, 0, 0), viewport, v);
+    	float x0 = v.x, y0 = v.y;
+    	invViewProj.unprojectInv(v.set(width, 0, 0), viewport, v);
+    	float x1 = v.x, y1 = v.y;
+    	float len = (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+    	return x0 % len - len * 0.25f;
+    }
+
     float tick(float range, float subs) {
         float tempStep = range / subs;
         float mag = (float) Math.floor(Math.log10(tempStep));
@@ -176,20 +195,22 @@ public class CoordinateSystemDemo {
     }
 
     void renderGrid() {
-        glColor3f(0.6f, 0.6f, 0.6f);
+        glColor3f(0.5f, 0.5f, 0.5f);
         glEnable(GL_LINE_STIPPLE);
-        glLineStipple(1, (short) 0x00FF);
+        glLineStipple(1, (short) 0x8888);
         glBegin(GL_LINES);
         float subticks = tick(Math.min(maxX - minX, maxY - minY), 12.0f);
+        float sx = stippleOffsetX(16);
+        float sy = stippleOffsetY(16);
         float startX = subticks * (float) Math.floor(minX / subticks);
         for (float x = startX; x <= maxX; x += subticks) {
-            glVertex2f(x, minY);
-            glVertex2f(x, maxY);
+            glVertex2f(x, minY - sy);
+            glVertex2f(x, maxY + sy);
         }
         float startY = subticks * (float) Math.floor(minY / subticks);
         for (float y = startY; y <= maxY; y += subticks) {
-            glVertex2f(minX, y);
-            glVertex2f(maxX, y);
+            glVertex2f(minX - sx, y);
+            glVertex2f(maxX + sx, y);
         }
         glEnd();
         glDisable(GL_LINE_STIPPLE);
@@ -213,6 +234,7 @@ public class CoordinateSystemDemo {
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
             glViewport(0, 0, width, height);
+            viewport[2] = width; viewport[3] = height;
             float aspect = (float) width / height;
             glClear(GL_COLOR_BUFFER_BIT);
             projMatrix.identity().ortho2D(-aspect, +aspect, -1, +1);
