@@ -76,7 +76,6 @@ public class CoordinateSystemDemo {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        glfwWindowHint(GLFW_SAMPLES, 4);
         window = glfwCreateWindow(width, height, "Hello coordinate system!", NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
@@ -266,6 +265,7 @@ public class CoordinateSystemDemo {
         	viewProjMatrix.transformPosition(v.set(x, 0, 0));
         	glTranslatef(v.x, v.y, 0);
         	glScalef(2.0f / width, -2.0f / height, 0.0f);
+        	glTranslatef(2, 3, 0);
         	int quads = stb_easy_font_print(0, 0, frmt.format(x), null, charBuffer);
             glDrawArrays(GL_QUADS, 0, quads * 4);
         }
@@ -277,6 +277,7 @@ public class CoordinateSystemDemo {
         	viewProjMatrix.transformPosition(v.set(0, y, 0));
         	glTranslatef(v.x, v.y, 0);
         	glScalef(2.0f / width, -2.0f / height, 0.0f);
+        	glTranslatef(3, 2, 0);
         	int quads = stb_easy_font_print(0, 0, frmt.format(y), null, charBuffer);
             glDrawArrays(GL_QUADS, 0, quads * 4);
         }
