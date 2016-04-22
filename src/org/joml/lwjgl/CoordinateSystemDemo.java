@@ -204,16 +204,22 @@ public class CoordinateSystemDemo {
     }
 
     float tick(float range, float subs) {
+        return tick(range, subs, false);
+    }
+
+    float tick(float range, float subs, boolean sub) {
         float tempStep = range / subs;
         float mag = (float) Math.floor(Math.log10(tempStep));
         float magPow = (float) Math.pow(10.0, mag);
         float magMsd = (int) (tempStep / magPow + 0.5f);
         if (magMsd > 5.0)
-            magMsd = 10.0f;
+            magMsd = sub ? 2.0f : 10.0f;
         else if (magMsd > 2.0f)
-            magMsd = 5.0f;
+            magMsd = sub ? 1.0f : 5.0f;
         else if (magMsd > 1.0f)
-            magMsd = 2.0f;
+            magMsd = sub ? 0.5f : 2.0f;
+        else if (magMsd == 1.0f)
+            magMsd = sub ? 0.2f : 1.0f;
         return magMsd * magPow;
     }
 
@@ -225,20 +231,42 @@ public class CoordinateSystemDemo {
         return (float) Math.sqrt((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y));
     }
 
+    float px(int px) {
+        invViewProj.unprojectInv(v.set(0, 0, 0), viewport, v);
+        float x0 = v.x, y0 = v.y;
+        invViewProj.unprojectInv(v.set(px, 0, 0), viewport, v);
+        float x1 = v.x, y1 = v.y;
+        return (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+    }
+
     void renderGrid() {
         glColor3f(0.5f, 0.5f, 0.5f);
+        glBegin(GL_LINES);
+        float sx = stippleOffsetX(16);
+        float sy = stippleOffsetY(16);
+        float subticks = tick(diagonal(), maxTicks, true);
+        float startX = subticks * (float) Math.floor(minX / subticks);
+        float subtickLen = px(5);
+        for (float x = startX; x <= maxX; x += subticks) {
+            glVertex2f(x, 0);
+            glVertex2f(x, +subtickLen);
+        }
+        float startY = subticks * (float) Math.floor(minY / subticks);
+        for (float y = startY; y <= maxY; y += subticks) {
+            glVertex2f(-subtickLen, y);
+            glVertex2f(0, y);
+        }
+        glEnd();
         glEnable(GL_LINE_STIPPLE);
         glLineStipple(1, (short) 0x8888);
         glBegin(GL_LINES);
         float ticks = tick(diagonal(), maxTicks);
-        float sx = stippleOffsetX(16);
-        float sy = stippleOffsetY(16);
-        float startX = ticks * (float) Math.floor(minX / ticks);
+        startX = ticks * (float) Math.floor(minX / ticks);
         for (float x = startX; x <= maxX; x += ticks) {
             glVertex2f(x, minY - sy);
             glVertex2f(x, maxY + sy);
         }
-        float startY = ticks * (float) Math.floor(minY / ticks);
+        startY = ticks * (float) Math.floor(minY / ticks);
         for (float y = startY; y <= maxY; y += ticks) {
             glVertex2f(minX - sx, y);
             glVertex2f(maxX + sx, y);
@@ -316,6 +344,8 @@ public class CoordinateSystemDemo {
         glPushMatrix();
     	float subticks = tick(diagonal(), maxTicks);
         float startX = subticks * (float) Math.floor(minX / subticks);
+        float xoff = 6.0f / width;
+        float yoff = 6.0f / height;
         for (float x = startX; x <= maxX; x += subticks) {
         	if (Math.abs(x) < 1E-5f)
         		continue;
@@ -326,11 +356,11 @@ public class CoordinateSystemDemo {
         	if (v.x < -1 && snapX(-1, x, -1, x, +1)) {
         	    glColor3f(0.5f, 0.3f, 0.3f);
         	    v.set(v2);
-        	    v.x += 4.0f / width;
+        	    v.x += xoff;
         	} else if (v.x > +1 && snapX(+1, x, -1, x, +1)) {
         	    glColor3f(0.5f, 0.3f, 0.3f);
         	    v.set(v2);
-        	    v.x -= textWidth + 4.0f / width;
+        	    v.x -= textWidth + xoff;
         	} else if (v.y < -1 && snapY(-1, x, -1, x, +1)) {
         	    glColor3f(0.5f, 0.3f, 0.3f);
                 v.set(v2);
@@ -338,9 +368,10 @@ public class CoordinateSystemDemo {
             } else if (v.y > +1 && snapY(+1, x, -1, x, +1)) {
                 glColor3f(0.5f, 0.3f, 0.3f);
                 v.set(v2);
-                v.y -= 4.0f / height;
+                v.y -= yoff;
         	} else {
         	    glColor3f(0.3f, 0.3f, 0.3f);
+        	    v.y -= yoff;
         	}
         	glLoadIdentity();
         	glTranslatef(v.x, v.y, 0);
@@ -363,18 +394,18 @@ public class CoordinateSystemDemo {
             } else if (v.y > +1 && snapY(+1, -1, y, +1, y)) {
                 glColor3f(0.3f, 0.5f, 0.3f);
                 v.set(v2);
-                v.y -= 4.0f / height;
+                v.y -= yoff;
             } else if (v.x < -1 && snapX(-1, -1, y, +1, y)) {
                 glColor3f(0.3f, 0.5f, 0.3f);
                 v.set(v2);
-                v.x += 4.0f / width;
+                v.x += xoff;
             } else if (v.x > +1 && snapX(+1, -1, y, +1, y)) {
                 glColor3f(0.3f, 0.5f, 0.3f);
                 v.set(v2);
-                v.x -= textWidth + 4.0f / width;
+                v.x -= textWidth + xoff;
             } else {
-                v.x += 4.0f / width;
-                v.y -= 4.0f / height;
+                v.x += xoff;
+                v.y -= yoff;
                 glColor3f(0.3f, 0.3f, 0.3f);
             }
         	glLoadIdentity();
