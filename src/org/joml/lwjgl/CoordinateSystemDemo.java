@@ -51,7 +51,7 @@ public class CoordinateSystemDemo {
     Vector2f p = new Vector2f();
     ByteBuffer charBuffer = BufferUtils.createByteBuffer(32 * 270);
     float textScale = 2.6f;
-    float maxTicks = 17.0f;
+    float ticksPer1000Px = 12.0f;
 
     DecimalFormat frmt = new DecimalFormat("0.###");
 
@@ -222,7 +222,7 @@ public class CoordinateSystemDemo {
         float x = v.x, y = v.y;
         invViewProj.transformPosition(v.set(+1, +1, 0));
         float x2 = v.x, y2 = v.y;
-        return (float) Math.sqrt((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y));
+        return Math.min(x2 - x, y2 - y);
     }
 
     void renderGrid() {
@@ -230,7 +230,7 @@ public class CoordinateSystemDemo {
         glEnable(GL_LINE_STIPPLE);
         glLineStipple(1, (short) 0x8888);
         glBegin(GL_LINES);
-        float ticks = tick(diagonal(), maxTicks);
+        float ticks = tick(diagonal(), ticksPer1000Px * height / 1000.0f);
         float sx = stippleOffsetX(16);
         float sy = stippleOffsetY(16);
         float startX = ticks * (float) Math.floor(minX / ticks);
@@ -314,9 +314,9 @@ public class CoordinateSystemDemo {
         glLoadIdentity();
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
-    	float subticks = tick(diagonal(), maxTicks);
-        float startX = subticks * (float) Math.floor(minX / subticks);
-        for (float x = startX; x <= maxX; x += subticks) {
+        float ticks = tick(diagonal(), ticksPer1000Px * height / 1000.0f);
+        float startX = ticks * (float) Math.floor(minX / ticks);
+        for (float x = startX; x <= maxX; x += ticks) {
         	if (Math.abs(x) < 1E-5f)
         		continue;
         	String text = frmt.format(x);
@@ -348,8 +348,8 @@ public class CoordinateSystemDemo {
         	int quads = stb_easy_font_print(0, 0, text, null, charBuffer);
             glDrawArrays(GL_QUADS, 0, quads * 4);
         }
-        float startY = subticks * (float) Math.floor(minY / subticks);
-        for (float y = startY; y <= maxY; y += subticks) {
+        float startY = ticks * (float) Math.floor(minY / ticks);
+        for (float y = startY; y <= maxY; y += ticks) {
         	if (Math.abs(y) < 1E-5f)
         		continue;
             String text = frmt.format(y);
