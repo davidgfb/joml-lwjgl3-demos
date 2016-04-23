@@ -239,8 +239,6 @@ public class BillboardDemo {
         long lastTime = System.nanoTime();
 
         Matrix4f mat = new Matrix4f();
-        // FloatBuffer for transferring matrices to OpenGL
-        FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 
         // Objects for building the billboard matrix
         Vector3f origin = new Vector3f();
@@ -271,17 +269,16 @@ public class BillboardDemo {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             mat.setPerspective((float) Math.toRadians(60),
-                               (float) width / height, 0.01f, 100.0f)
-               .get(fb);
+                               (float) width / height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(mat.ms);
 
             /*
              * Obtain the camera's view matrix and render grid.
              */
-            cam.viewMatrix(mat.identity()).get(fb);
+            cam.viewMatrix(mat.identity());
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(mat.ms);
             renderGrid();
 
             /* Determine camera origin */
@@ -311,7 +308,7 @@ public class BillboardDemo {
 
                 /* Multiply with view-projection matrix */
                 mat.mul(modelMatrices[i], modelViewProj);
-                glLoadMatrixf(modelViewProj.get(fb));
+                glLoadMatrixf(modelViewProj.ms);
                 renderCube();
             }
 

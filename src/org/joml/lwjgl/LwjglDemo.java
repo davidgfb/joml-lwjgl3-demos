@@ -25,9 +25,6 @@ public class LwjglDemo {
     Matrix4f projMatrix = new Matrix4f();
     Matrix4f viewMatrix = new Matrix4f();
 
-    // FloatBuffer for transferring matrices to OpenGL
-    FloatBuffer fb = BufferUtils.createFloatBuffer(16);
-
     void run() {
         try {
             init();
@@ -145,10 +142,9 @@ public class LwjglDemo {
             // on window width and height. Make sure to cast them to float
             // before dividing, or else we would do an integer division!
             projMatrix.setPerspective((float) Math.atan((screenHeight * height / screenHeightPx) / distanceToScreen),
-                                      (float)width/height, 0.01f, 100.0f)
-                       .get(fb);
+                                      (float)width/height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(projMatrix.ms);
 
             // Build a model-view matrix which first rotates the cube
             // about the Y-axis and then lets a "camera" look at that
@@ -157,10 +153,9 @@ public class LwjglDemo {
                                  0.0f, 0.0f, 0.0f,
                                  0.0f, 1.0f, 0.0f)
                       // rotate 90 degrees per second
-                      .rotateY(angle * (float) Math.toRadians(90))
-                      .get(fb);
+                      .rotateY(angle * (float) Math.toRadians(90));
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(viewMatrix.ms);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 

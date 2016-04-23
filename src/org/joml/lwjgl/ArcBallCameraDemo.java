@@ -187,8 +187,6 @@ public class ArcBallCameraDemo {
         long lastTime = System.nanoTime();
 
         Matrix4f mat = new Matrix4f();
-        // FloatBuffer for transferring matrices to OpenGL
-        FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 
         cam.setAlpha((float) Math.toRadians(-20));
         cam.setBeta((float) Math.toRadians(20));
@@ -214,22 +212,21 @@ public class ArcBallCameraDemo {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             mat.setPerspective((float) Math.atan((ViewSettings.screenHeight * height / ViewSettings.screenHeightPx) / ViewSettings.distanceToScreen),
-                               (float) width / height, 0.01f, 100.0f)
-               .get(fb);
+                               (float) width / height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(mat.ms);
 
             /*
              * Obtain the camera's view matrix and render grid.
              */
-            cam.viewMatrix(mat.identity()).get(fb);
+            cam.viewMatrix(mat.identity());
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(mat.ms);
             renderGrid();
 
             /* Translate to cube position and render cube */
-            mat.translate(cam.centerMover.target).get(fb);
-            glLoadMatrixf(fb);
+            mat.translate(cam.centerMover.target);
+            glLoadMatrixf(mat.ms);
             renderCube();
 
             glfwSwapBuffers(window);

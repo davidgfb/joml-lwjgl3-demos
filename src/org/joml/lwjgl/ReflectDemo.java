@@ -214,8 +214,6 @@ public class ReflectDemo {
         long lastTime = System.nanoTime();
 
         Matrix4f mat = new Matrix4f();
-        // FloatBuffer for transferring matrices to OpenGL
-        FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 
         cam.setAlpha((float) Math.toRadians(-20));
         cam.setBeta((float) Math.toRadians(20));
@@ -254,20 +252,20 @@ public class ReflectDemo {
             mat.setPerspective((float) Math.atan((ViewSettings.screenHeight * height / ViewSettings.screenHeightPx) / ViewSettings.distanceToScreen),
                                (float) width / height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(mat.get(fb));
+            glLoadMatrixf(mat.ms);
 
             /*
              * Obtain the camera's view matrix and render grid.
              */
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(cam.viewMatrix(mat.identity()).get(fb));
+            glLoadMatrixf(cam.viewMatrix(mat.identity()).ms);
 
             /* Stencil the mirror */
             mirrorMatrix.set(mat)
                         .translate(mirrorPosition)
                         .rotate(mirrorOrientation)
                         .scale(15.0f, 8.5f, 1.0f);
-            glLoadMatrixf(mirrorMatrix.get(fb));
+            glLoadMatrixf(mirrorMatrix.ms);
             glEnable(GL_STENCIL_TEST);
             glColorMask(false, false, false, false);
             glDisable(GL_DEPTH_TEST);
@@ -282,7 +280,7 @@ public class ReflectDemo {
             /* Render the reflected scene */
             reflectMatrix.set(mat)
                          .reflect(mirrorOrientation, mirrorPosition);
-            glLoadMatrixf(reflectMatrix.get(fb));
+            glLoadMatrixf(reflectMatrix.ms);
             renderGrid();
             glFrontFace(GL_CW);
             renderCube();
@@ -290,15 +288,13 @@ public class ReflectDemo {
             glDisable(GL_STENCIL_TEST);
 
             /* Render visible mirror geometry with blending */
-            mirrorMatrix.get(fb);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(mirrorMatrix.ms);
             glEnable(GL_BLEND);
             renderMirror(true);
             glDisable(GL_BLEND);
 
             /* Render scene normally */
-            mat.get(fb);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(mat.ms);
             renderGrid();
             renderCube();
 

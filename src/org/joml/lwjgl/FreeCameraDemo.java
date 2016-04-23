@@ -171,8 +171,6 @@ public class FreeCameraDemo {
 
         Vector3f tmp = new Vector3f();
         Matrix4f mat = new Matrix4f();
-        // FloatBuffer for transferring matrices to OpenGL
-        FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 
         while (!glfwWindowShouldClose(window)) {
             // Update camera input
@@ -208,13 +206,13 @@ public class FreeCameraDemo {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(mat.setPerspective((float) Math.toRadians(45), (float) width / height, 0.01f, 100.0f).get(fb));
+            glLoadMatrixf(mat.setPerspective((float) Math.toRadians(45), (float) width / height, 0.01f, 100.0f).ms);
 
             /*
              * Obtain the camera's view matrix
              */
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(cam.apply(mat.identity()).get(fb));
+            glLoadMatrixf(cam.apply(mat.identity()).ms);
 
             renderGrid();
             renderCube();

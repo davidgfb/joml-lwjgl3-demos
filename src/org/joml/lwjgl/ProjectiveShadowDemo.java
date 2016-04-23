@@ -21,9 +21,6 @@ public class ProjectiveShadowDemo {
     int width = 300;
     int height = 300;
 
-    // FloatBuffer for transferring matrices to OpenGL
-    FloatBuffer fb = BufferUtils.createFloatBuffer(16);
-
     void run() {
         try {
             init();
@@ -177,14 +174,14 @@ public class ProjectiveShadowDemo {
                 m.setPerspective(
                     (float) Math.toRadians(30.0f),
                     (float)width/height,
-                    0.01f, 100.0f).get(fb));
+                    0.01f, 100.0f).ms);
 
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixf(
                 m.setLookAt(1.0f, 6.0f, 12.0f,
                             0.0f, 0.0f, 0.0f,
                             0.0f, 1.0f, 0.0f)
-                  .rotateY(angle / 5.0f).get(fb));
+                  .rotateY(angle / 5.0f).ms);
 
             // always write stencil = 1
             glStencilFunc(GL_ALWAYS, 1, 1);
@@ -193,16 +190,16 @@ public class ProjectiveShadowDemo {
             renderCube(false);
 
             // Render the plane on which to project the shadow
-            glLoadMatrixf(m.mulAffine(planeTransform, m2).get(fb));
+            glLoadMatrixf(m.mulAffine(planeTransform, m2).ms);
             renderPlane();
 
             // Render light bulb
             m2.rotationY(angle).translate(0, 0.8f, 2).transform(lightPos.set(0, 0, 0, 1));
-            glLoadMatrixf(m.mulAffine(m2, m2).get(fb));
+            glLoadMatrixf(m.mulAffine(m2, m2).ms);
             renderLight();
 
             // Render projected shadow of the cube
-            glLoadMatrixf(m.shadow(lightPos, planeTransform).get(fb));
+            glLoadMatrixf(m.shadow(lightPos, planeTransform).ms);
             // Draw only on the stenciled area
             glStencilFunc(GL_EQUAL, 1, 1);
             glEnable(GL_POLYGON_OFFSET_FILL);

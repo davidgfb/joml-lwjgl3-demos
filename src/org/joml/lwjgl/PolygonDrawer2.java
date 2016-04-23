@@ -52,7 +52,6 @@ public class PolygonDrawer2 {
     Matrix4f transformation = new Matrix4f();
     Matrix4f transformationInv = new Matrix4f();
     Vector3f p = new Vector3f();
-    FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
 
     void run() {
         try {
@@ -261,7 +260,7 @@ public class PolygonDrawer2 {
                 .rotateZ(angle += dt * 0.2f)
                 .translate(-width/2, -height/2, 0)
                 .invert(transformationInv);
-            glLoadMatrixf(transformation.get(matBuffer));
+            glLoadMatrixf(transformation.ms);
 
             intersect();
             renderPolygon();

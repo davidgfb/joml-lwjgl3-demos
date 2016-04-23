@@ -45,7 +45,6 @@ public class CoordinateSystemDemo {
     Matrix4f viewProjMatrix = new Matrix4f();
     Matrix4f invViewProj = new Matrix4f();
     Matrix4f tmp = new Matrix4f();
-    FloatBuffer fb = BufferUtils.createFloatBuffer(16);
     Vector3f v = new Vector3f();
     Vector3f v2 = new Vector3f();
     Vector2f p = new Vector2f();
@@ -460,7 +459,7 @@ public class CoordinateSystemDemo {
                           .invertAffine(invViewProj);
             computeVisibleExtents();
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(viewProjMatrix.get(fb));
+            glLoadMatrixf(viewProjMatrix.ms);
             renderGrid();
             renderTickLabels();
             renderMouseCursorCoordinates();
