@@ -1,11 +1,8 @@
 package org.joml.lwjgl;
 
 import org.joml.Matrix4f;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
-
-import java.nio.FloatBuffer;
 
 import static org.joml.lwjgl.ViewSettings.*;
 import static org.lwjgl.glfw.GLFW.*;

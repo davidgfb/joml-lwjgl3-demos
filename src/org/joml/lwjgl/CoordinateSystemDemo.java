@@ -6,7 +6,6 @@ import static org.lwjgl.system.MemoryUtil.*;
 import static org.lwjgl.stb.STBEasyFont.*;
 
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 
 import org.joml.Intersectionf;
