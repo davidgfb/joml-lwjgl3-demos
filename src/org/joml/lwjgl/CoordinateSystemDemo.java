@@ -458,7 +458,7 @@ public class CoordinateSystemDemo {
                           .invertAffine(invViewProj);
             computeVisibleExtents();
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(viewProjMatrix.ms);
+            nglLoadMatrixf(viewProjMatrix.address);
             renderGrid();
             renderTickLabels();
             renderMouseCursorCoordinates();

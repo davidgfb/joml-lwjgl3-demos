@@ -251,20 +251,20 @@ public class ReflectDemo {
             mat.setPerspective((float) Math.atan((ViewSettings.screenHeight * height / ViewSettings.screenHeightPx) / ViewSettings.distanceToScreen),
                                (float) width / height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(mat.ms);
+            nglLoadMatrixf(mat.address);
 
             /*
              * Obtain the camera's view matrix and render grid.
              */
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(cam.viewMatrix(mat.identity()).ms);
+            nglLoadMatrixf(cam.viewMatrix(mat.identity()).address);
 
             /* Stencil the mirror */
             mirrorMatrix.set(mat)
                         .translate(mirrorPosition)
                         .rotate(mirrorOrientation)
                         .scale(15.0f, 8.5f, 1.0f);
-            glLoadMatrixf(mirrorMatrix.ms);
+            nglLoadMatrixf(mirrorMatrix.address);
             glEnable(GL_STENCIL_TEST);
             glColorMask(false, false, false, false);
             glDisable(GL_DEPTH_TEST);
@@ -275,11 +275,10 @@ public class ReflectDemo {
             glEnable(GL_DEPTH_TEST);
             glStencilFunc(GL_EQUAL, 1, 1);
             glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-
             /* Render the reflected scene */
             reflectMatrix.set(mat)
                          .reflect(mirrorOrientation, mirrorPosition);
-            glLoadMatrixf(reflectMatrix.ms);
+            nglLoadMatrixf(reflectMatrix.address);
             renderGrid();
             glFrontFace(GL_CW);
             renderCube();
@@ -287,13 +286,13 @@ public class ReflectDemo {
             glDisable(GL_STENCIL_TEST);
 
             /* Render visible mirror geometry with blending */
-            glLoadMatrixf(mirrorMatrix.ms);
+            nglLoadMatrixf(mirrorMatrix.address);
             glEnable(GL_BLEND);
             renderMirror(true);
             glDisable(GL_BLEND);
 
             /* Render scene normally */
-            glLoadMatrixf(mat.ms);
+            nglLoadMatrixf(mat.address);
             renderGrid();
             renderCube();
 

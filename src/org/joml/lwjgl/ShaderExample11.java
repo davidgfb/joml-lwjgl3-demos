@@ -191,7 +191,7 @@ public class ShaderExample11 {
                                   0.0f, 1.0f, 0.0f);
             // Upload the matrix stored in the FloatBuffer to the
             // shader uniform.
-            glUniformMatrix4fvARB(matLocation, false, viewProjMatrix.ms);
+            nglUniformMatrix4fvARB(matLocation, 1, false, viewProjMatrix.address);
             // Render the grid without rotating
             glUniform3fARB(colorLocation, 0.3f, 0.3f, 0.3f);
             renderGrid();
@@ -201,7 +201,7 @@ public class ShaderExample11 {
             viewProjMatrix.translate(0.0f, 0.5f, 0.0f)
                           .rotate(q.rotateY((float) Math.toRadians(45) * dt).normalize());
             // Upload the matrix
-            glUniformMatrix4fvARB(matLocation, false, viewProjMatrix.ms);
+            nglUniformMatrix4fvARB(matLocation, 1, false, viewProjMatrix.address);
 
             // Render solid cube with outlines
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

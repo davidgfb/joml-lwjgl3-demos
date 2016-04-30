@@ -167,18 +167,18 @@ public class ProjectiveShadowDemo {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(
+            nglLoadMatrixf(
                 m.setPerspective(
                     (float) Math.toRadians(30.0f),
                     (float)width/height,
-                    0.01f, 100.0f).ms);
+                    0.01f, 100.0f).address);
 
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(
+            nglLoadMatrixf(
                 m.setLookAt(1.0f, 6.0f, 12.0f,
                             0.0f, 0.0f, 0.0f,
                             0.0f, 1.0f, 0.0f)
-                  .rotateY(angle / 5.0f).ms);
+                  .rotateY(angle / 5.0f).address);
 
             // always write stencil = 1
             glStencilFunc(GL_ALWAYS, 1, 1);
@@ -187,16 +187,16 @@ public class ProjectiveShadowDemo {
             renderCube(false);
 
             // Render the plane on which to project the shadow
-            glLoadMatrixf(m.mulAffine(planeTransform, m2).ms);
+            nglLoadMatrixf(m.mulAffine(planeTransform, m2).address);
             renderPlane();
 
             // Render light bulb
             m2.rotationY(angle).translate(0, 0.8f, 2).transform(lightPos.set(0, 0, 0, 1));
-            glLoadMatrixf(m.mulAffine(m2, m2).ms);
+            nglLoadMatrixf(m.mulAffine(m2, m2).address);
             renderLight();
 
             // Render projected shadow of the cube
-            glLoadMatrixf(m.shadow(lightPos, planeTransform).ms);
+            nglLoadMatrixf(m.shadow(lightPos, planeTransform).address);
             // Draw only on the stenciled area
             glStencilFunc(GL_EQUAL, 1, 1);
             glEnable(GL_POLYGON_OFFSET_FILL);

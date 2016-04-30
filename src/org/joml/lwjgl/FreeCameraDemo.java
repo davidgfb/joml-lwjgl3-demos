@@ -205,13 +205,13 @@ public class FreeCameraDemo {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(mat.setPerspective((float) Math.toRadians(45), (float) width / height, 0.01f, 100.0f).ms);
+            nglLoadMatrixf(mat.setPerspective((float) Math.toRadians(45), (float) width / height, 0.01f, 100.0f).address);
 
             /*
              * Obtain the camera's view matrix
              */
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(cam.apply(mat.identity()).ms);
+            nglLoadMatrixf(cam.apply(mat.identity()).address);
 
             renderGrid();
             renderCube();

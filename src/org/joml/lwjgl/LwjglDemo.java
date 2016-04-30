@@ -141,7 +141,7 @@ public class LwjglDemo {
             projMatrix.setPerspective((float) Math.atan((screenHeight * height / screenHeightPx) / distanceToScreen),
                                       (float)width/height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(projMatrix.ms);
+            nglLoadMatrixf(projMatrix.address);
 
             // Build a model-view matrix which first rotates the cube
             // about the Y-axis and then lets a "camera" look at that
@@ -152,7 +152,7 @@ public class LwjglDemo {
                       // rotate 90 degrees per second
                       .rotateY(angle * (float) Math.toRadians(90));
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(viewMatrix.ms);
+            nglLoadMatrixf(viewMatrix.address);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 

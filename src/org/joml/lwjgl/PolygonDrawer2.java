@@ -259,7 +259,7 @@ public class PolygonDrawer2 {
                 .rotateZ(angle += dt * 0.2f)
                 .translate(-width/2, -height/2, 0)
                 .invert(transformationInv);
-            glLoadMatrixf(transformation.ms);
+            nglLoadMatrixf(transformation.address);
 
             intersect();
             renderPolygon();

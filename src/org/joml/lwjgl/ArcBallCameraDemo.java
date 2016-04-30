@@ -213,19 +213,19 @@ public class ArcBallCameraDemo {
             mat.setPerspective((float) Math.atan((ViewSettings.screenHeight * height / ViewSettings.screenHeightPx) / ViewSettings.distanceToScreen),
                                (float) width / height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(mat.ms);
+            nglLoadMatrixf(mat.address);
 
             /*
              * Obtain the camera's view matrix and render grid.
              */
             cam.viewMatrix(mat.identity());
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(mat.ms);
+            nglLoadMatrixf(mat.address);
             renderGrid();
 
             /* Translate to cube position and render cube */
             mat.translate(cam.centerMover.target);
-            glLoadMatrixf(mat.ms);
+            nglLoadMatrixf(mat.address);
             renderCube();
 
             glfwSwapBuffers(window);

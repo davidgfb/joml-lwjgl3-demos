@@ -270,14 +270,14 @@ public class BillboardDemo {
             mat.setPerspective((float) Math.toRadians(60),
                                (float) width / height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(mat.ms);
+            nglLoadMatrixf(mat.address);
 
             /*
              * Obtain the camera's view matrix and render grid.
              */
             cam.viewMatrix(mat.identity());
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(mat.ms);
+            nglLoadMatrixf(mat.address);
             renderGrid();
 
             /* Determine camera origin */
@@ -307,7 +307,7 @@ public class BillboardDemo {
 
                 /* Multiply with view-projection matrix */
                 mat.mul(modelMatrices[i], modelViewProj);
-                glLoadMatrixf(modelViewProj.ms);
+                nglLoadMatrixf(modelViewProj.address);
                 renderCube();
             }
 
