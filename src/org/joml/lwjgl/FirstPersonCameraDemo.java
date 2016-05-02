@@ -58,6 +58,7 @@ public class FirstPersonCameraDemo {
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
+        System.out.println("Press ESC to close the application.");
         System.out.println("Press W/S to move forward/backward.");
         System.out.println("Press A/D to strave left/right.");
         System.out.println("Press left shift/ctrl to move faster/slower.");
@@ -85,10 +86,8 @@ public class FirstPersonCameraDemo {
         });
         glfwSetCursorPosCallback(window, cpCallback = new GLFWCursorPosCallback() {
             public void invoke(long window, double xpos, double ypos) {
-                float normX = (float) ((xpos - width / 2.0) / width * 2.0);
-                float normY = (float) ((ypos - height / 2.0) / height * 2.0);
-                mouseX = Math.max(-width / 2.0f, Math.min(width / 2.0f, normX));
-                mouseY = Math.max(-height / 2.0f, Math.min(height / 2.0f, normY));
+                mouseX = (float)xpos / width;
+                mouseY = (float)ypos / height;
             }
         });
 
@@ -99,11 +98,11 @@ public class FirstPersonCameraDemo {
         nglfwGetFramebufferSize(window, memAddress(framebufferSize), memAddress(framebufferSize) + 4);
         width = framebufferSize.get(0);
         height = framebufferSize.get(1);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
         glfwShowWindow(window);
-        glfwSetCursorPos(window, width / 2, height / 2);
     }
 
     int dl = -1;
@@ -153,7 +152,6 @@ public class FirstPersonCameraDemo {
             float diff = (float) ((thisTime - lastTime) / 1E9);
             lastTime = thisTime;
             float move = diff * movementSpeed;
-            float rotate = diff;
 
             if (keyDown[GLFW_KEY_LEFT_SHIFT])
                 move *= 2.0f;
@@ -171,9 +169,8 @@ public class FirstPersonCameraDemo {
                 pos.sub(right);
             if (keyDown[GLFW_KEY_D])
                 pos.add(right);
-            rotX += mouseY * rotate;
-            rotX = Math.min(Math.max(rotX, -(float) Math.PI * 0.5f), (float) Math.PI * 0.5f);
-            rotY += mouseX * rotate;
+            rotX = mouseY;
+            rotY = mouseX;
 
             glMatrixMode(GL_PROJECTION);
             glLoadMatrixf(mat.setPerspective((float) Math.toRadians(45), (float) width / height, 0.01f, 100.0f).get(fb));
