@@ -22,10 +22,12 @@ public class FirstPersonCameraDemo {
     long window;
     int width = 800;
     int height = 600;
+    boolean windowed;
+
     float mouseX, mouseY;
     boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST + 1];
     float heightAboveGround = 1.80f;
-    float movementSpeed = 1.666f;
+    float movementSpeed = 2.666f;
     int gridSize = 40;
     float ceiling = 3.0f;
 
@@ -54,7 +56,13 @@ public class FirstPersonCameraDemo {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        window = glfwCreateWindow(width, height, "Hello first person camera!", NULL, NULL);
+        long monitor = glfwGetPrimaryMonitor();
+        GLFWVidMode vidmode = glfwGetVideoMode(monitor);
+        if (!windowed) {
+            width = vidmode.width();
+            height = vidmode.height();
+        }
+        window = glfwCreateWindow(width, height, "Hello first person camera!", !windowed ? monitor : NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -91,8 +99,9 @@ public class FirstPersonCameraDemo {
             }
         });
 
-        GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowPos(window, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
+        if (windowed) {
+            glfwSetWindowPos(window, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
+        }
 
         IntBuffer framebufferSize = BufferUtils.createIntBuffer(2);
         nglfwGetFramebufferSize(window, memAddress(framebufferSize), memAddress(framebufferSize) + 4);
@@ -118,8 +127,6 @@ public class FirstPersonCameraDemo {
                 glVertex3f(i, 0.0f, -gridSize);
                 glVertex3f(i, 0.0f, gridSize);
             }
-            glEnd();
-            glBegin(GL_LINES);
             glColor3f(0.5f, 0.5f, 0.5f);
             for (int i = -gridSize; i <= gridSize; i++) {
                 glVertex3f(-gridSize, ceiling, i);
@@ -183,7 +190,7 @@ public class FirstPersonCameraDemo {
             glLoadMatrixf(mat.get(fb));
 
             glViewport(0, 0, width, height);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT);
             renderGrid();
 
             glfwSwapBuffers(window);
