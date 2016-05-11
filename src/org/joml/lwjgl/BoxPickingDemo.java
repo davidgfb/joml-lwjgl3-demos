@@ -26,13 +26,13 @@ public class BoxPickingDemo {
     long window;
     int width = 1200;
     int height = 800;
-    boolean windowed;
+    boolean windowed = true;
 
     float mouseX, mouseY;
     boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST + 1];
     float movementSpeed = 3.666f;
     int LEVEL_LENGTH = 64;
-    int LEVEL_HEIGHT = 8;
+    int LEVEL_HEIGHT = 64;
     static float GHOST_CUBE_ALPHA = 0.4f;
     boolean displayListNeedsRecompile;
     int displayList = -1;
@@ -88,7 +88,7 @@ public class BoxPickingDemo {
         System.out.println("Press ESC to close the application.");
         System.out.println("Press W/S to move forward/backward.");
         System.out.println("Press A/D to strave left/right.");
-        System.out.println("Press left shift to move faster/slower.");
+        System.out.println("Press left shift to move faster.");
         System.out.println("Press left control/spacebar to move up/down.");
         System.out.println("Move the mouse to rotate.");
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
@@ -304,6 +304,23 @@ public class BoxPickingDemo {
         }
     }
 
+    void drawCrosshair() {
+        glEnable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+        glPushMatrix();
+        glLoadIdentity();
+        glBegin(GL_LINES);
+        glColor4f(0.2f, 0.2f, 0.2f, 0.6f);
+        glVertex3f(-0.01f, 0.0f, -1.0f);
+        glVertex3f(+0.01f, 0.0f, -1.0f);
+        glVertex3f(0.0f, -0.01f, -1.0f);
+        glVertex3f(0.0f, +0.01f, -1.0f);
+        glEnd();
+        glPopMatrix();
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
+    }
+
     void loop() {
         GL.createCapabilities();
         glClearColor(0.97f, 0.97f, 0.97f, 1.0f);
@@ -329,8 +346,6 @@ public class BoxPickingDemo {
 
             if (keyDown[GLFW_KEY_LEFT_SHIFT])
                 move *= 2.0f;
-            if (keyDown[GLFW_KEY_LEFT_CONTROL])
-                move *= 0.5f;
             viewMatrix.positiveZ(dir).negate().mul(move);
             viewMatrix.positiveX(right).mul(move);
             viewMatrix.positiveY(up).mul(move);
@@ -364,6 +379,7 @@ public class BoxPickingDemo {
             }
             computeGhostCube();
             renderGhostCube();
+            drawCrosshair();
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
