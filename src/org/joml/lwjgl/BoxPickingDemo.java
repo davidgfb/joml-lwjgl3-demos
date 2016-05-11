@@ -33,9 +33,11 @@ public class BoxPickingDemo {
     float movementSpeed = 3.666f;
     int LEVEL_LENGTH = 64;
     int LEVEL_HEIGHT = 8;
+    static float GHOST_CUBE_ALPHA = 0.4f;
     boolean displayListNeedsRecompile;
     int displayList = -1;
     int selectedCube = -1;
+    int ghostCube = -1;
     Vector3f pos = new Vector3f(0, 2, 0);
     Vector3f selectedPos = new Vector3f();
     Vector3f tmp = new Vector3f();
@@ -139,34 +141,34 @@ public class BoxPickingDemo {
         glfwShowWindow(window);
     }
 
-    static void renderCube(int x, int y, int z, boolean selected) {
+    static void renderCube(int x, int y, int z, boolean selected, boolean ghost) {
         glBegin(GL_QUADS);
-        glColor3f(selected ? 1.0f : 0.0f, 0.0f, 0.2f);
+        glColor4f(selected ? 1.0f : 0.0f, 0.0f, 0.2f, ghost ? GHOST_CUBE_ALPHA : 1.0f);
         glVertex3f(0.49f + x, -0.49f + y, -0.49f + z);
         glVertex3f(-0.49f + x, -0.49f + y, -0.49f + z);
         glVertex3f(-0.49f + x, 0.49f + y, -0.49f + z);
         glVertex3f(0.49f + x, 0.49f + y, -0.49f + z);
-        glColor3f(selected ? 1.0f : 0.0f, 0.0f, 1.0f);
+        glColor4f(selected ? 1.0f : 0.0f, 0.0f, 1.0f, ghost ? GHOST_CUBE_ALPHA : 1.0f);
         glVertex3f(0.49f + x, -0.49f + y, 0.49f + z);
         glVertex3f(0.49f + x, 0.49f + y, 0.49f + z);
         glVertex3f(-0.49f + x, 0.49f + y, 0.49f + z);
         glVertex3f(-0.49f + x, -0.49f + y, 0.49f + z);
-        glColor3f(1.0f, 0.0f, 0.0f);
+        glColor4f(1.0f, 0.0f, 0.0f, ghost ? 0.2f : 1.0f);
         glVertex3f(0.49f + x, -0.49f + y, -0.49f + z);
         glVertex3f(0.49f + x, 0.49f + y, -0.49f + z);
         glVertex3f(0.49f + x, 0.49f + y, 0.49f + z);
         glVertex3f(0.49f + x, -0.49f + y, 0.49f + z);
-        glColor3f(selected ? 1.0f : 0.0f, 0.0f, 0.0f);
+        glColor4f(selected ? 1.0f : 0.0f, 0.0f, 0.0f, ghost ? GHOST_CUBE_ALPHA : 1.0f);
         glVertex3f(-0.49f + x, -0.49f + y, 0.49f + z);
         glVertex3f(-0.49f + x, 0.49f + y, 0.49f + z);
         glVertex3f(-0.49f + x, 0.49f + y, -0.49f + z);
         glVertex3f(-0.49f + x, -0.49f + y, -0.49f + z);
-        glColor3f(selected ? 1.0f : 0.0f, 1.0f, 0.0f);
+        glColor4f(selected ? 1.0f : 0.0f, 1.0f, 0.0f, ghost ? GHOST_CUBE_ALPHA : 1.0f);
         glVertex3f(0.49f + x, 0.49f + y, 0.49f + z);
         glVertex3f(0.49f + x, 0.49f + y, -0.49f + z);
         glVertex3f(-0.49f + x, 0.49f + y, -0.49f + z);
         glVertex3f(-0.49f + x, 0.49f + y, 0.49f + z);
-        glColor3f(selected ? 1.0f : 0.0f, 0.2f, 0.0f);
+        glColor4f(selected ? 1.0f : 0.0f, 0.2f, 0.0f, ghost ? GHOST_CUBE_ALPHA : 1.0f);
         glVertex3f(0.49f + x, -0.49f + y, -0.49f + z);
         glVertex3f(0.49f + x, -0.49f + y, 0.49f + z);
         glVertex3f(-0.49f + x, -0.49f + y, 0.49f + z);
@@ -215,7 +217,7 @@ public class BoxPickingDemo {
                         int px = (x - LEVEL_LENGTH / 2);
                         int py = y;
                         int pz = (z - LEVEL_LENGTH / 2);
-                        renderCube(px, py, pz, false);
+                        renderCube(px, py, pz, false, false);
                     }
                 }
             }
@@ -232,7 +234,7 @@ public class BoxPickingDemo {
         int z = idx % LEVEL_LENGTH;
         idx /= LEVEL_LENGTH;
         int y = idx;
-        renderCube(x - LEVEL_LENGTH / 2, y, z - LEVEL_LENGTH / 2, true);
+        renderCube(x - LEVEL_LENGTH / 2, y, z - LEVEL_LENGTH / 2, true, false);
         glPopMatrix();
     }
 
@@ -240,7 +242,33 @@ public class BoxPickingDemo {
         return x >= 0 && x < LEVEL_LENGTH && y >= 0 && y < LEVEL_HEIGHT && z >= 0 && z < LEVEL_LENGTH;
     }
 
+    void renderGhostCube() {
+        if (ghostCube == -1)
+            return;
+        glEnable(GL_BLEND);
+        glPushMatrix();
+        int idx = ghostCube;
+        int x = idx % LEVEL_LENGTH;
+        idx /= LEVEL_LENGTH;
+        int z = idx % LEVEL_LENGTH;
+        idx /= LEVEL_LENGTH;
+        int y = idx;
+        renderCube(x - LEVEL_LENGTH / 2, y, z - LEVEL_LENGTH / 2, true, true);
+        glPopMatrix();
+        glDisable(GL_BLEND);
+    }
+
     void clickSelected(boolean add) {
+        if (add && ghostCube != -1) {
+            boxes[ghostCube] = true;
+            displayListNeedsRecompile = true;
+        } else if (selectedCube != -1) {
+            boxes[selectedCube] = false;
+            displayListNeedsRecompile = true;
+        }
+    }
+
+    void computeGhostCube() {
         if (selectedCube == -1)
             return;
         int idx = selectedCube;
@@ -249,36 +277,30 @@ public class BoxPickingDemo {
         int z = idx % LEVEL_LENGTH;
         idx /= LEVEL_LENGTH;
         int y = idx;
-        if (add) {
-            float px = x - LEVEL_LENGTH / 2;
-            float py = y;
-            float pz = z - LEVEL_LENGTH / 2;
-            Vector3f d = tmp.set(selectedPos).sub(px, py, pz);
-            int maxComponent = d.maxComponent();
-            int nx, ny, nz;
-            int signX = d.x > 0.0f ? 1 : -1;
-            int signY = d.y > 0.0f ? 1 : -1;
-            int signZ = d.z > 0.0f ? 1 : -1;
-            if (maxComponent == 0) {
-                nx = x + signX;
-                ny = y;
-                nz = z;
-            } else if (maxComponent == 1) {
-                nx = x;
-                ny = y + signY;
-                nz = z;
-            } else {
-                nx = x;
-                ny = y;
-                nz = z + signZ;
-            }
-            if (inRange(nx, ny, nz)) {
-                boxes[ny * LEVEL_LENGTH * LEVEL_LENGTH + nz * LEVEL_LENGTH + nx] = true;
-                displayListNeedsRecompile = true;
-            }
+        float px = x - LEVEL_LENGTH / 2;
+        float py = y;
+        float pz = z - LEVEL_LENGTH / 2;
+        Vector3f d = tmp.set(selectedPos).sub(px, py, pz);
+        int maxComponent = d.maxComponent();
+        int nx, ny, nz;
+        int signX = d.x > 0.0f ? 1 : -1;
+        int signY = d.y > 0.0f ? 1 : -1;
+        int signZ = d.z > 0.0f ? 1 : -1;
+        if (maxComponent == 0) {
+            nx = x + signX;
+            ny = y;
+            nz = z;
+        } else if (maxComponent == 1) {
+            nx = x;
+            ny = y + signY;
+            nz = z;
         } else {
-            boxes[y * LEVEL_LENGTH * LEVEL_LENGTH + z * LEVEL_LENGTH + x] = false;
-            displayListNeedsRecompile = true;
+            nx = x;
+            ny = y;
+            nz = z + signZ;
+        }
+        if (inRange(nx, ny, nz)) {
+            ghostCube = ny * LEVEL_LENGTH * LEVEL_LENGTH + nz * LEVEL_LENGTH + nx;
         }
     }
 
@@ -288,6 +310,7 @@ public class BoxPickingDemo {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         glDepthFunc(GL_LEQUAL);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         long lastTime = System.nanoTime();
         Vector3f dir = new Vector3f();
@@ -339,6 +362,8 @@ public class BoxPickingDemo {
             if (selectedCube != -1) {
                 renderSelectedCube();
             }
+            computeGhostCube();
+            renderGhostCube();
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
