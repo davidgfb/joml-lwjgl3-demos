@@ -11,7 +11,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class LwjglDemo {
+public class LwjglDemoLH {
     GLFWErrorCallback errorCallback;
     GLFWKeyCallback   keyCallback;
     GLFWFramebufferSizeCallback fbCallback;
@@ -84,35 +84,35 @@ public class LwjglDemo {
     void renderCube() {
         glBegin(GL_QUADS);
         glColor3f(   0.0f,  0.0f,  0.2f );
-        glVertex3f(  0.5f, -0.5f, -0.5f );
-        glVertex3f( -0.5f, -0.5f, -0.5f );
-        glVertex3f( -0.5f,  0.5f, -0.5f );
-        glVertex3f(  0.5f,  0.5f, -0.5f );
+        glVertex3f(  0.5f, -0.5f,  0.5f );
+        glVertex3f( -0.5f, -0.5f,  0.5f );
+        glVertex3f( -0.5f,  0.5f,  0.5f );
+        glVertex3f(  0.5f,  0.5f,  0.5f );
         glColor3f(   0.0f,  0.0f,  1.0f );
-        glVertex3f(  0.5f, -0.5f,  0.5f );
-        glVertex3f(  0.5f,  0.5f,  0.5f );
-        glVertex3f( -0.5f,  0.5f,  0.5f );
-        glVertex3f( -0.5f, -0.5f,  0.5f );
+        glVertex3f(  0.5f, -0.5f, -0.5f );
+        glVertex3f(  0.5f,  0.5f, -0.5f );
+        glVertex3f( -0.5f,  0.5f, -0.5f );
+        glVertex3f( -0.5f, -0.5f, -0.5f );
         glColor3f(   1.0f,  0.0f,  0.0f );
-        glVertex3f(  0.5f, -0.5f, -0.5f );
-        glVertex3f(  0.5f,  0.5f, -0.5f );
-        glVertex3f(  0.5f,  0.5f,  0.5f );
         glVertex3f(  0.5f, -0.5f,  0.5f );
+        glVertex3f(  0.5f,  0.5f,  0.5f );
+        glVertex3f(  0.5f,  0.5f, -0.5f );
+        glVertex3f(  0.5f, -0.5f, -0.5f );
         glColor3f(   0.2f,  0.0f,  0.0f );
-        glVertex3f( -0.5f, -0.5f,  0.5f );
-        glVertex3f( -0.5f,  0.5f,  0.5f );
-        glVertex3f( -0.5f,  0.5f, -0.5f );
         glVertex3f( -0.5f, -0.5f, -0.5f );
+        glVertex3f( -0.5f,  0.5f, -0.5f );
+        glVertex3f( -0.5f,  0.5f,  0.5f );
+        glVertex3f( -0.5f, -0.5f,  0.5f );
         glColor3f(   0.0f,  1.0f,  0.0f );
-        glVertex3f(  0.5f,  0.5f,  0.5f );
         glVertex3f(  0.5f,  0.5f, -0.5f );
-        glVertex3f( -0.5f,  0.5f, -0.5f );
+        glVertex3f(  0.5f,  0.5f,  0.5f );
         glVertex3f( -0.5f,  0.5f,  0.5f );
+        glVertex3f( -0.5f,  0.5f, -0.5f );
         glColor3f(   0.0f,  0.2f,  0.0f );
-        glVertex3f(  0.5f, -0.5f, -0.5f );
         glVertex3f(  0.5f, -0.5f,  0.5f );
-        glVertex3f( -0.5f, -0.5f,  0.5f );
+        glVertex3f(  0.5f, -0.5f, -0.5f );
         glVertex3f( -0.5f, -0.5f, -0.5f );
+        glVertex3f( -0.5f, -0.5f,  0.5f );
         glEnd();
     }
 
@@ -143,23 +143,21 @@ public class LwjglDemo {
             // and the screen size and compute the correct aspect ratio based
             // on window width and height. Make sure to cast them to float
             // before dividing, or else we would do an integer division!
-            projMatrix.setPerspective((float) Math.toRadians(40),
-                                      (float)width/height, 0.01f, 100.0f)
-                       .get(fb);
+            projMatrix.setPerspectiveLH((float) Math.toRadians(40),
+                                        (float)width/height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(projMatrix.get(fb));
 
             // Build a model-view matrix which first rotates the cube
             // about the Y-axis and then lets a "camera" look at that
             // cube from a certain distance.
-            viewMatrix.setLookAt(0.0f, 2.0f, 5.0f,
-                                 0.0f, 0.0f, 0.0f,
-                                 0.0f, 1.0f, 0.0f)
+            viewMatrix.setLookAtLH(0.0f, 2.0f, -5.0f,
+                                   0.0f, 0.0f, 0.0f,
+                                   0.0f, 1.0f, 0.0f)
                       // rotate 90 degrees per second
-                      .rotateY(angle * (float) Math.toRadians(90))
-                      .get(fb);
+                      .rotateY(angle * (float) Math.toRadians(90));
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(viewMatrix.get(fb));
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
@@ -172,6 +170,6 @@ public class LwjglDemo {
     }
 
     public static void main(String[] args) {
-        new LwjglDemo().run();
+        new LwjglDemoLH().run();
     }
 }
