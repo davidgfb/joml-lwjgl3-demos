@@ -310,7 +310,7 @@ public class BillboardDemo {
                 }
 
                 /* Multiply with view-projection matrix */
-                mat.mul(modelMatrices[i], modelViewProj);
+                mat.mulAffine(modelMatrices[i], modelViewProj);
                 glLoadMatrixf(modelViewProj.get(fb));
                 renderCube();
             }
