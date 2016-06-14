@@ -22,7 +22,7 @@ public class FirstPersonCameraDemo {
     long window;
     int width = 800;
     int height = 600;
-    boolean windowed;
+    boolean windowed = true;
 
     float mouseX, mouseY;
     boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST + 1];
