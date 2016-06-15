@@ -138,11 +138,8 @@ public class LwjglDemo {
             // Make the viewport always fill the whole window.
             glViewport(0, 0, width, height);
 
-            // Build the projection matrix in JOML by computing the vertical
-            // field-of-view of based on the distance between viewer and screen
-            // and the screen size and compute the correct aspect ratio based
-            // on window width and height. Make sure to cast them to float
-            // before dividing, or else we would do an integer division!
+            // Build the projection matrix. Watch out here for integer division
+            // when computing the aspect ratio!
             projMatrix.setPerspective((float) Math.toRadians(40),
                                       (float)width/height, 0.01f, 100.0f)
                        .get(fb);

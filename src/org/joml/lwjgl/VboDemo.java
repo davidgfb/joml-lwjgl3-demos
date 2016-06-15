@@ -185,10 +185,8 @@ public class VboDemo {
             // Make the viewport always fill the whole window.
             glViewport(0, 0, width, height);
 
-            // Build the projection matrix in JOML by using some fixed vertical
-            // field-of-view and compute the correct aspect ratio based
-            // on window width and height. Make sure to cast them to float
-            // before dividing, or else we would do an integer division!
+            // Build the projection matrix. Watch out here for integer division
+            // when computing the aspect ratio!
             projMatrix.setPerspective((float) Math.toRadians(30.0f),
                                       (float)width/height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
