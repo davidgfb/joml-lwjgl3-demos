@@ -127,10 +127,11 @@ public class CoordinateSystemDemo {
                 } else if (yoffset < 0.0) {
                     scale = 1.0f / 1.2f;
                 }
-                tmp.translation(oldMouseNX, oldMouseNY, 0)
-                   .scale(scale)
-                   .translate(-oldMouseNX, -oldMouseNY, 0)
-                   .mulAffine(viewMatrix, viewMatrix);
+//                tmp.translation(oldMouseNX, oldMouseNY, 0)
+//                   .scale(scale)
+//                   .translate(-oldMouseNX, -oldMouseNY, 0)
+//                   .mulAffine(viewMatrix, viewMatrix);
+                viewMatrix.scaleAroundLocal(scale, oldMouseNX, oldMouseNY, 0);
             }
         });
         glfwSetMouseButtonCallback(window, mbCallback = new GLFWMouseButtonCallback() {
