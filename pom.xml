@@ -45,7 +45,19 @@
 			<dependencies>
 				<dependency>
 					<groupId>org.lwjgl</groupId>
-					<artifactId>lwjgl-platform</artifactId>
+					<artifactId>lwjgl</artifactId>
+					<version>${lwjgl.version}</version>
+					<classifier>natives-windows</classifier>
+				</dependency>
+				<dependency>
+					<groupId>org.lwjgl</groupId>
+					<artifactId>lwjgl-glfw</artifactId>
+					<version>${lwjgl.version}</version>
+					<classifier>natives-windows</classifier>
+				</dependency>
+				<dependency>
+					<groupId>org.lwjgl</groupId>
+					<artifactId>lwjgl-stb</artifactId>
 					<version>${lwjgl.version}</version>
 					<classifier>natives-windows</classifier>
 				</dependency>
@@ -61,7 +73,19 @@
 			<dependencies>
 				<dependency>
 					<groupId>org.lwjgl</groupId>
-					<artifactId>lwjgl-platform</artifactId>
+					<artifactId>lwjgl</artifactId>
+					<version>${lwjgl.version}</version>
+					<classifier>natives-linux</classifier>
+				</dependency>
+				<dependency>
+					<groupId>org.lwjgl</groupId>
+					<artifactId>lwjgl-glfw</artifactId>
+					<version>${lwjgl.version}</version>
+					<classifier>natives-linux</classifier>
+				</dependency>
+				<dependency>
+					<groupId>org.lwjgl</groupId>
+					<artifactId>lwjgl-stb</artifactId>
 					<version>${lwjgl.version}</version>
 					<classifier>natives-linux</classifier>
 				</dependency>
@@ -78,6 +102,18 @@
 				<dependency>
 					<groupId>org.lwjgl</groupId>
 					<artifactId>lwjgl-platform</artifactId>
+					<version>${lwjgl.version}</version>
+					<classifier>natives-osx</classifier>
+				</dependency>
+				<dependency>
+					<groupId>org.lwjgl</groupId>
+					<artifactId>lwjgl-glfw</artifactId>
+					<version>${lwjgl.version}</version>
+					<classifier>natives-osx</classifier>
+				</dependency>
+				<dependency>
+					<groupId>org.lwjgl</groupId>
+					<artifactId>lwjgl-stb</artifactId>
 					<version>${lwjgl.version}</version>
 					<classifier>natives-osx</classifier>
 				</dependency>
@@ -115,6 +151,21 @@
 		<dependency>
 			<groupId>org.lwjgl</groupId>
 			<artifactId>lwjgl</artifactId>
+			<version>${lwjgl.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.lwjgl</groupId>
+			<artifactId>lwjgl-glfw</artifactId>
+			<version>${lwjgl.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.lwjgl</groupId>
+			<artifactId>lwjgl-opengl</artifactId>
+			<version>${lwjgl.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.lwjgl</groupId>
+			<artifactId>lwjgl-stb</artifactId>
 			<version>${lwjgl.version}</version>
 		</dependency>
 	</dependencies>
