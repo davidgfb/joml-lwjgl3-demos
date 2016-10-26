@@ -18,11 +18,14 @@ public class FreeCameraDemo {
     GLFWErrorCallback errorCallback;
     GLFWKeyCallback keyCallback;
     GLFWFramebufferSizeCallback fbCallback;
+    GLFWWindowSizeCallback wsCallback;
     GLFWCursorPosCallback cpCallback;
 
     long window;
     int width = 800;
     int height = 600;
+    int fbWidth = 800;
+    int fbHeight = 600;
     float mouseX, mouseY;
     boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST];
 
@@ -38,6 +41,7 @@ public class FreeCameraDemo {
 
             glfwDestroyWindow(window);
             keyCallback.free();
+            wsCallback.free();
             fbCallback.free();
             cpCallback.free();
         } finally {
@@ -82,6 +86,15 @@ public class FreeCameraDemo {
             @Override
             public void invoke(long window, int w, int h) {
                 if (w > 0 && h > 0) {
+                    fbWidth = w;
+                    fbHeight = h;
+                }
+            }
+        });
+        glfwSetWindowSizeCallback(window, wsCallback = new GLFWWindowSizeCallback() {
+            @Override
+            public void invoke(long window, int w, int h) {
+                if (w > 0 && h > 0) {
                     width = w;
                     height = h;
                 }
@@ -101,8 +114,8 @@ public class FreeCameraDemo {
 
         IntBuffer framebufferSize = BufferUtils.createIntBuffer(2);
         nglfwGetFramebufferSize(window, memAddress(framebufferSize), memAddress(framebufferSize) + 4);
-        width = framebufferSize.get(0);
-        height = framebufferSize.get(1);
+        fbWidth = framebufferSize.get(0);
+        fbHeight = framebufferSize.get(1);
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
@@ -204,7 +217,7 @@ public class FreeCameraDemo {
             /* And let the camera make its update */
             cam.update(diff);
 
-            glViewport(0, 0, width, height);
+            glViewport(0, 0, fbWidth, fbHeight);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             glMatrixMode(GL_PROJECTION);

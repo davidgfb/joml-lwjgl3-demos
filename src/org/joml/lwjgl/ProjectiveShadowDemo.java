@@ -7,6 +7,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -77,6 +78,11 @@ public class ProjectiveShadowDemo {
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
         glfwShowWindow(window);
+
+        IntBuffer framebufferSize = BufferUtils.createIntBuffer(2);
+        nglfwGetFramebufferSize(window, memAddress(framebufferSize), memAddress(framebufferSize) + 4);
+        width = framebufferSize.get(0);
+        height = framebufferSize.get(1);
     }
 
     void renderPlane() {

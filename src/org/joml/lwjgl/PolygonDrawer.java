@@ -17,6 +17,7 @@ import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 
 /**
@@ -31,10 +32,13 @@ public class PolygonDrawer {
     GLFWFramebufferSizeCallback fbCallback;
     GLFWCursorPosCallback cpCallback;
     GLFWMouseButtonCallback mbCallback;
+    GLFWWindowSizeCallback wsCallback;
 
     long window;
     int width = 800;
     int height = 600;
+    int fbWidth = 800;
+    int fbHeight = 600;
     int x, y;
     boolean down;
     float[] verticesXY = new float[1024 * 1024];
@@ -57,6 +61,7 @@ public class PolygonDrawer {
             fbCallback.free();
             cpCallback.free();
             mbCallback.free();
+            wsCallback.free();
         } finally {
             glfwTerminate();
             errorCallback.free();
@@ -147,6 +152,14 @@ public class PolygonDrawer {
         });
         glfwSetFramebufferSizeCallback(window, fbCallback = new GLFWFramebufferSizeCallback() {
             @Override
+            public void invoke(long window, int w, int h) {
+                if (w > 0 && h > 0) {
+                    fbWidth = w;
+                    fbHeight = h;
+                }
+            }
+        });
+        glfwSetWindowSizeCallback(window, wsCallback = new GLFWWindowSizeCallback() {
             public void invoke(long window, int w, int h) {
                 if (w > 0 && h > 0) {
                     width = w;
@@ -279,12 +292,12 @@ public class PolygonDrawer {
         glLineWidth(1.8f);
 
         while (!glfwWindowShouldClose(window)) {
-            glViewport(0, 0, width, height);
+            glViewport(0, 0, fbWidth, fbHeight);
             glClear(GL_COLOR_BUFFER_BIT);
 
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            glOrtho(0, width, height, 0, -1, 1);
+            glOrtho(0, fbWidth, fbHeight, 0, -1, 1);
             glMatrixMode(GL_MODELVIEW);
             glLoadIdentity();
 

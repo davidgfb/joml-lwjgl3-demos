@@ -8,6 +8,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -80,8 +81,12 @@ public class ShaderExample4x3 {
 
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwSetWindowPos(window, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
-
         glfwShowWindow(window);
+
+        IntBuffer framebufferSize = BufferUtils.createIntBuffer(2);
+        nglfwGetFramebufferSize(window, memAddress(framebufferSize), memAddress(framebufferSize) + 4);
+        width = framebufferSize.get(0);
+        height = framebufferSize.get(1);
     }
 
     void renderCube() {

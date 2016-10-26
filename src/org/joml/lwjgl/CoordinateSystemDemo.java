@@ -7,6 +7,7 @@ import static org.lwjgl.stb.STBEasyFont.*;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.text.DecimalFormat;
 
 import org.joml.Intersectionf;
@@ -21,12 +22,14 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 
 public class CoordinateSystemDemo {
     GLFWErrorCallback errorCallback;
     GLFWKeyCallback keyCallback;
     GLFWFramebufferSizeCallback fbCallback;
+    GLFWWindowSizeCallback wsCallback;
     GLFWCursorPosCallback cpCallback;
     GLFWMouseButtonCallback mbCallback;
     GLFWScrollCallback sCallback;
@@ -34,6 +37,8 @@ public class CoordinateSystemDemo {
     long window;
     int width = 1024;
     int height = 768;
+    int fbWidth = 1024;
+    int fbHeight = 768;
 
     float minX, minY;
     float maxX, maxY;
@@ -62,6 +67,10 @@ public class CoordinateSystemDemo {
             glfwDestroyWindow(window);
             keyCallback.free();
             fbCallback.free();
+            wsCallback.free();
+            cpCallback.free();
+            mbCallback.free();
+            sCallback.free();
         } finally {
             glfwTerminate();
             errorCallback.free();
@@ -161,6 +170,14 @@ public class CoordinateSystemDemo {
         glfwSetFramebufferSizeCallback(window, fbCallback = new GLFWFramebufferSizeCallback() {
             public void invoke(long window, int w, int h) {
                 if (w > 0 && h > 0) {
+                    fbWidth = w;
+                    fbHeight = h;
+                }
+            }
+        });
+        glfwSetWindowSizeCallback(window, wsCallback = new GLFWWindowSizeCallback() {
+            public void invoke(long window, int w, int h) {
+                if (w > 0 && h > 0) {
                     width = w;
                     height = h;
                 }
@@ -168,6 +185,10 @@ public class CoordinateSystemDemo {
         });
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwSetWindowPos(window, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
+        IntBuffer framebufferSize = BufferUtils.createIntBuffer(2);
+        nglfwGetFramebufferSize(window, memAddress(framebufferSize), memAddress(framebufferSize) + 4);
+        fbWidth = framebufferSize.get(0);
+        fbHeight = framebufferSize.get(1);
     }
 
     void computeVisibleExtents() {
@@ -452,8 +473,8 @@ public class CoordinateSystemDemo {
         glClearColor(0.97f, 0.97f, 0.97f, 1.0f);
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
-            glViewport(0, 0, width, height);
-            viewport[2] = width; viewport[3] = height;
+            glViewport(0, 0, fbWidth, fbHeight);
+            viewport[2] = fbWidth; viewport[3] = fbHeight;
             float aspect = (float) width / height;
             glClear(GL_COLOR_BUFFER_BIT);
             viewProjMatrix.setOrtho2D(-aspect, +aspect, -1, +1)
