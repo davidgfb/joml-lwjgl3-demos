@@ -29,6 +29,8 @@ public class CameraDemo {
     int inactive = 1;
     // And a model matrix for a rotating cube
     Matrix4f modelMatrix = new Matrix4f();
+    // Temporary vector
+    Vector3f tmp = new Vector3f();
 
     void run() {
         try {
@@ -137,10 +139,20 @@ public class CameraDemo {
     }
 
     void renderFrustum(Matrix4f m) {
+    	// Perspective origin to near plane
+    	Vector3f v = tmp;
+    	glBegin(GL_LINES);
+    	glColor3f(0.2f, 0.2f, 0.2f);
+    	for (int i = 0; i < 4; i++) {
+    		m.perspectiveOrigin(v);
+    		glVertex3f(v.x, v.y, v.z);
+            m.frustumCorner(i, v);
+            glVertex3f(v.x, v.y, v.z);
+        }
+    	glEnd();
         // Near plane
         glBegin(GL_LINE_STRIP);
         glColor3f(0.8f, 0.2f, 0.2f);
-        Vector3f v = new Vector3f();
         for (int i = 0; i < 4 + 1; i++) {
             m.frustumCorner(i & 3, v);
             glVertex3f(v.x, v.y, v.z);
@@ -194,8 +206,8 @@ public class CameraDemo {
             float angle = diff;
 
             // Setup both camera's projection matrices
-            projMatrix[0].setPerspective((float) Math.toRadians(40), (float)width/height, 0.01f, 20.0f);
-            projMatrix[1].setPerspective((float) Math.toRadians(30), (float)width/height, 0.1f, 6.0f);
+            projMatrix[0].setPerspective((float) Math.toRadians(40), (float)width/height, 1.0f, 20.0f);
+            projMatrix[1].setPerspective((float) Math.toRadians(30), (float)width/height, 2.0f, 5.0f);
 
             // Load the active camera's projection
             glMatrixMode(GL_PROJECTION);
@@ -205,14 +217,12 @@ public class CameraDemo {
             viewMatrix[0].setLookAt(0, 2, 10, 0, 0, 0, 0, 1, 0);
             viewMatrix[1].setLookAt(3, 1, 1, 0, 0, 0, 0, 1, 0);
 
-            // Load the active camera's view
-            glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(viewMatrix[active].get(fb));
-
-            // Apply model transformation
+            // Apply model transformation to active camera's view
             modelMatrix.rotationY(angle * (float) Math.toRadians(10));
             viewMatrix[active].mul(modelMatrix, modelView);
+
             // And load it
+            glMatrixMode(GL_MODELVIEW);
             glLoadMatrixf(modelView.get(fb));
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
