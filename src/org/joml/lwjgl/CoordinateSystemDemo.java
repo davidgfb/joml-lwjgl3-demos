@@ -155,15 +155,15 @@ public class CoordinateSystemDemo {
                     translate = false;
                     rotate = false;
                 } else if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_MIDDLE) {
-                	viewMatrix.positiveX(v);
-                	float xx = v.x, xy = v.y;
-                	viewMatrix.positiveY(v);
-                	float yx = v.x, yy = v.y;
-                	tmp.set(xx, xy, 0, 0,
-                	        yx, yy, 0, 0,
-                	        0,  0,  1, 0,
-                	        0,  0,  0, 1)
-                	   .mulAffine(viewMatrix, viewMatrix);
+                    viewMatrix.positiveX(v);
+                    float xx = v.x, xy = v.y;
+                    viewMatrix.positiveY(v);
+                    float yx = v.x, yy = v.y;
+                    tmp.set(xx, xy, 0, 0,
+                            yx, yy, 0, 0,
+                            0,  0,  1, 0,
+                            0,  0,  0, 1)
+                       .mulAffine(viewMatrix, viewMatrix);
                 }
             }
         });
@@ -208,21 +208,21 @@ public class CoordinateSystemDemo {
     }
 
     float stippleOffsetY(int width) {
-    	invViewProj.unprojectInv(v.set(0, 0, 0), viewport, v);
-    	float x0 = v.x, y0 = v.y;
-    	invViewProj.unprojectInv(v.set(0, width, 0), viewport, v);
-    	float x1 = v.x, y1 = v.y;
-    	float len = (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
-    	return y0 % len - len * 0.25f;
+        invViewProj.unprojectInv(v.set(0, 0, 0), viewport, v);
+        float x0 = v.x, y0 = v.y;
+        invViewProj.unprojectInv(v.set(0, width, 0), viewport, v);
+        float x1 = v.x, y1 = v.y;
+        float len = (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+        return y0 % len - len * 0.25f;
     }
 
     float stippleOffsetX(int width) {
-    	invViewProj.unprojectInv(v.set(0, 0, 0), viewport, v);
-    	float x0 = v.x, y0 = v.y;
-    	invViewProj.unprojectInv(v.set(width, 0, 0), viewport, v);
-    	float x1 = v.x, y1 = v.y;
-    	float len = (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
-    	return x0 % len - len * 0.25f;
+        invViewProj.unprojectInv(v.set(0, 0, 0), viewport, v);
+        float x0 = v.x, y0 = v.y;
+        invViewProj.unprojectInv(v.set(width, 0, 0), viewport, v);
+        float x1 = v.x, y1 = v.y;
+        float len = (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+        return x0 % len - len * 0.25f;
     }
 
     float tick(float range, float subs) {
@@ -357,54 +357,54 @@ public class CoordinateSystemDemo {
     }
 
     void renderTickLabels() {
-    	glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(2, GL_FLOAT, 16, charBuffer);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
-    	float subticks = tick(diagonal(), maxTicks);
+        float subticks = tick(diagonal(), maxTicks);
         float startX = subticks * (float) Math.floor(minX / subticks);
         float xoff = 6.0f / width;
         float yoff = 6.0f / height;
         for (float x = startX; x <= maxX; x += subticks) {
-        	if (Math.abs(x) < 1E-5f)
-        		continue;
-        	String text = frmt.format(x);
-        	float textWidth = textWidth(text);
-        	float textHeight = textHeight(text);
-        	viewProjMatrix.transformPosition(v.set(x, 0, 0));
-        	if (v.x < -1 && snapX(-1, x, -1, x, +1)) {
-        	    glColor3f(0.5f, 0.3f, 0.3f);
-        	    v.set(v2);
-        	    v.x += xoff;
-        	} else if (v.x > +1 && snapX(+1, x, -1, x, +1)) {
-        	    glColor3f(0.5f, 0.3f, 0.3f);
-        	    v.set(v2);
-        	    v.x -= textWidth + xoff;
-        	} else if (v.y < -1 && snapY(-1, x, -1, x, +1)) {
-        	    glColor3f(0.5f, 0.3f, 0.3f);
+            if (Math.abs(x) < 1E-5f)
+                continue;
+            String text = frmt.format(x);
+            float textWidth = textWidth(text);
+            float textHeight = textHeight(text);
+            viewProjMatrix.transformPosition(v.set(x, 0, 0));
+            if (v.x < -1 && snapX(-1, x, -1, x, +1)) {
+                glColor3f(0.5f, 0.3f, 0.3f);
+                v.set(v2);
+                v.x += xoff;
+            } else if (v.x > +1 && snapX(+1, x, -1, x, +1)) {
+                glColor3f(0.5f, 0.3f, 0.3f);
+                v.set(v2);
+                v.x -= textWidth + xoff;
+            } else if (v.y < -1 && snapY(-1, x, -1, x, +1)) {
+                glColor3f(0.5f, 0.3f, 0.3f);
                 v.set(v2);
                 v.y += textHeight * 0.8f;
             } else if (v.y > +1 && snapY(+1, x, -1, x, +1)) {
                 glColor3f(0.5f, 0.3f, 0.3f);
                 v.set(v2);
                 v.y -= yoff;
-        	} else {
-        	    glColor3f(0.3f, 0.3f, 0.3f);
-        	    v.y -= yoff;
-        	}
-        	glLoadIdentity();
-        	glTranslatef(v.x, v.y, 0);
-        	glScalef(textScale / width, -textScale / height, 0.0f);
-        	int quads = stb_easy_font_print(0, 0, text, null, charBuffer);
+            } else {
+                glColor3f(0.3f, 0.3f, 0.3f);
+                v.y -= yoff;
+            }
+            glLoadIdentity();
+            glTranslatef(v.x, v.y, 0);
+            glScalef(textScale / width, -textScale / height, 0.0f);
+            int quads = stb_easy_font_print(0, 0, text, null, charBuffer);
             glDrawArrays(GL_QUADS, 0, quads * 4);
         }
         float startY = subticks * (float) Math.floor(minY / subticks);
         for (float y = startY; y <= maxY; y += subticks) {
-        	if (Math.abs(y) < 1E-5f)
-        		continue;
+            if (Math.abs(y) < 1E-5f)
+                continue;
             String text = frmt.format(y);
             float textWidth = textWidth(text);
             float textHeight = textHeight(text);
@@ -430,10 +430,10 @@ public class CoordinateSystemDemo {
                 v.y -= yoff;
                 glColor3f(0.3f, 0.3f, 0.3f);
             }
-        	glLoadIdentity();
-        	glTranslatef(v.x, v.y, 0);
-        	glScalef(textScale / width, -textScale / height, 0.0f);
-        	int quads = stb_easy_font_print(0, 0, text, null, charBuffer);
+            glLoadIdentity();
+            glTranslatef(v.x, v.y, 0);
+            glScalef(textScale / width, -textScale / height, 0.0f);
+            int quads = stb_easy_font_print(0, 0, text, null, charBuffer);
             glDrawArrays(GL_QUADS, 0, quads * 4);
         }
         glDisableClientState(GL_VERTEX_ARRAY);

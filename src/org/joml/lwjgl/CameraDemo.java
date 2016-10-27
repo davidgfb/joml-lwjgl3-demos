@@ -31,6 +31,9 @@ public class CameraDemo {
     Matrix4f modelMatrix = new Matrix4f();
     // Temporary vector
     Vector3f tmp = new Vector3f();
+    // Rotation of the inactive camera
+    float rotate = 0.0f;
+    float[] rotation = {0.0f, 0.0f};
 
     void run() {
         try {
@@ -67,6 +70,15 @@ public class CameraDemo {
                     glfwSetWindowShouldClose(window, true);
                 if (key == GLFW_KEY_C && action == GLFW_RELEASE)
                     switchCamera();
+                if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+                    rotate = 1.0f;
+                } else if (key == GLFW_KEY_LEFT && (action == GLFW_RELEASE)) {
+                    rotate = 0.0f;
+                } else if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+                    rotate = -1.0f;
+                } else if (key == GLFW_KEY_RIGHT && (action == GLFW_RELEASE)) {
+                    rotate = 0.0f;
+                }
             }
         });
         glfwSetFramebufferSizeCallback(window, fbCallback = new GLFWFramebufferSizeCallback() {
@@ -139,17 +151,17 @@ public class CameraDemo {
     }
 
     void renderFrustum(Matrix4f m) {
-    	// Perspective origin to near plane
-    	Vector3f v = tmp;
-    	glBegin(GL_LINES);
-    	glColor3f(0.2f, 0.2f, 0.2f);
-    	for (int i = 0; i < 4; i++) {
-    		m.perspectiveOrigin(v);
-    		glVertex3f(v.x, v.y, v.z);
+        // Perspective origin to near plane
+        Vector3f v = tmp;
+        glBegin(GL_LINES);
+        glColor3f(0.2f, 0.2f, 0.2f);
+        for (int i = 0; i < 4; i++) {
+            m.perspectiveOrigin(v);
+            glVertex3f(v.x, v.y, v.z);
             m.frustumCorner(i, v);
             glVertex3f(v.x, v.y, v.z);
         }
-    	glEnd();
+        glEnd();
         // Near plane
         glBegin(GL_LINE_STRIP);
         glColor3f(0.8f, 0.2f, 0.2f);
@@ -192,6 +204,7 @@ public class CameraDemo {
 
         // Remember the current time.
         long firstTime = System.nanoTime();
+        long lastTime = firstTime;
 
         // FloatBuffer for transferring matrices to OpenGL
         FloatBuffer fb = BufferUtils.createFloatBuffer(16);
@@ -204,6 +217,11 @@ public class CameraDemo {
             long thisTime = System.nanoTime();
             float diff = (thisTime - firstTime) / 1E9f;
             float angle = diff;
+            float delta = (thisTime - lastTime) / 1E9f;
+            lastTime = thisTime;
+
+            // Process rotation
+            rotation[inactive] += rotate * delta;
 
             // Setup both camera's projection matrices
             projMatrix[0].setPerspective((float) Math.toRadians(40), (float)width/height, 1.0f, 20.0f);
@@ -214,8 +232,8 @@ public class CameraDemo {
             glLoadMatrixf(projMatrix[active].get(fb));
 
             // Setup both camera's view matrices
-            viewMatrix[0].setLookAt(0, 2, 10, 0, 0, 0, 0, 1, 0);
-            viewMatrix[1].setLookAt(3, 1, 1, 0, 0, 0, 0, 1, 0);
+            viewMatrix[0].setLookAt(0, 2, 10, 0, 0, 0, 0, 1, 0).rotateY(rotation[0]);
+            viewMatrix[1].setLookAt(3, 1, 1, 0, 0, 0, 0, 1, 0).rotateY(rotation[1]);
 
             // Apply model transformation to active camera's view
             modelMatrix.rotationY(angle * (float) Math.toRadians(10));
