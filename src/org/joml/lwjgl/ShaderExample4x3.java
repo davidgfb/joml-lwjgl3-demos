@@ -125,7 +125,7 @@ public class ShaderExample4x3 {
 
     void renderGrid() {
         glBegin(GL_LINES);
-        for (int i = -20; i < 20; i++) {
+        for (int i = -20; i <= 20; i++) {
             glVertex3f(-20.0f, 0.0f, i);
             glVertex3f( 20.0f, 0.0f, i);
             glVertex3f(i, 0.0f, -20.0f);
