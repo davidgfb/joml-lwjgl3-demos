@@ -54,7 +54,7 @@
 				</os>
 			</activation>
 			<properties>
-				<platform>windows</platform>
+				<platform>linux</platform>
 			</properties>
 		</profile>
 		<profile>
