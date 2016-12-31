@@ -32,7 +32,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<lwjgl.version>3.1.1-SNAPSHOT</lwjgl.version>
+		<lwjgl.version>3.1.2-SNAPSHOT</lwjgl.version>
 	</properties>
 	<profiles>
 		<profile>
