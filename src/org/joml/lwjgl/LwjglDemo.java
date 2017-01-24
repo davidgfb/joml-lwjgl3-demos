@@ -17,12 +17,14 @@ public class LwjglDemo {
     GLFWFramebufferSizeCallback fbCallback;
 
     long window;
-    int width = 300;
+    int width = 400;
     int height = 300;
 
     // JOML matrices
     Matrix4f projMatrix = new Matrix4f();
     Matrix4f viewMatrix = new Matrix4f();
+    Matrix4f modelMatrix = new Matrix4f();
+    Matrix4f modelViewMatrix = new Matrix4f();
 
     // FloatBuffer for transferring matrices to OpenGL
     FloatBuffer fb = BufferUtils.createFloatBuffer(16);
@@ -141,28 +143,26 @@ public class LwjglDemo {
             // Build the projection matrix. Watch out here for integer division
             // when computing the aspect ratio!
             projMatrix.setPerspective((float) Math.toRadians(40),
-                                      (float)width/height, 0.01f, 100.0f)
-                       .get(fb);
+                                      (float)width/height, 0.01f, 100.0f);
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(projMatrix.get(fb));
 
-            // Build a model-view matrix which first rotates the cube
-            // about the Y-axis and then lets a "camera" look at that
-            // cube from a certain distance.
-            viewMatrix.setLookAt(0.0f, 2.0f, 5.0f,
+            // Set lookat view matrix
+            viewMatrix.setLookAt(0.0f, 4.0f, 10.0f,
                                  0.0f, 0.0f, 0.0f,
-                                 0.0f, 1.0f, 0.0f)
-                      // rotate 90 degrees per second
-                      .rotateY(angle * (float) Math.toRadians(90))
-                      .get(fb);
+                                 0.0f, 1.0f, 0.0f);
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(fb);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
-
-            // Render a simple cube
-            renderCube();
-
+            // Render some grid of cubes at different x and z positions
+            for (int x = -2; x <= 2; x++) {
+                for (int z = -2; z <= 2; z++) {
+                    modelMatrix.translation(x * 2.0f, 0, z * 2.0f)
+                               .rotateY(angle * (float) Math.toRadians(90));
+                    glLoadMatrixf(viewMatrix.mul(modelMatrix, modelViewMatrix).get(fb));
+                    renderCube();
+                }
+            }
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
