@@ -63,9 +63,9 @@ public class OrthoDemo {
         glfwSetMouseButtonCallback(window, mbCallback = new GLFWMouseButtonCallback() {
             public void invoke(long window, int button, int action, int mods) {
                 if (action == GLFW_PRESS) {
-                    cam.onMouseDown();
+                    cam.onMouseDown(button);
                 } else {
-                    cam.onMouseUp();
+                    cam.onMouseUp(button);
                 }
             }
         });
@@ -115,7 +115,7 @@ public class OrthoDemo {
             /* Upload matrix to shader program */
             glUniformMatrix4fv(matLocation, false, cam.viewproj().get(fb));
 
-            /* Draw a simple quad using framebuffer coordinates */
+            /* Draw a simple quad */
             glBegin(GL_QUADS);
             glVertex2f(100, 100);
             glVertex2f(200, 100);
