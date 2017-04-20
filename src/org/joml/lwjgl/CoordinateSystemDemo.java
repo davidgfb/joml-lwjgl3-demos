@@ -2,8 +2,8 @@ package org.joml.lwjgl;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.system.MemoryUtil.*;
 import static org.lwjgl.stb.STBEasyFont.*;
+import static org.lwjgl.system.MemoryUtil.*;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -13,6 +13,9 @@ import java.text.DecimalFormat;
 import org.joml.Intersectionf;
 import org.joml.Matrix3x2f;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.joml.camera.OrthoCameraControl;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -34,27 +37,26 @@ public class CoordinateSystemDemo {
     GLFWScrollCallback sCallback;
 
     long window;
-    int width = 1024;
-    int height = 768;
-    int fbWidth = 1024;
-    int fbHeight = 768;
+    int width = 1280;
+    int height = 720;
+    int fbWidth = 1280;
+    int fbHeight = 720;
 
     float minX, minY;
     float maxX, maxY;
-    float oldMouseX, oldMouseY, oldMouseNX, oldMouseNY;
+    float mouseX, mouseY;
     int[] viewport = new int[4];
     boolean translate;
     boolean rotate;
-    Matrix3x2f viewMatrix = new Matrix3x2f();
-    Matrix3x2f viewProjMatrix = new Matrix3x2f();
-    Matrix3x2f invViewProj = new Matrix3x2f();
+    OrthoCameraControl cam = new OrthoCameraControl(4);
     Matrix3x2f tmp = new Matrix3x2f();
     FloatBuffer fb = BufferUtils.createFloatBuffer(16);
-    Vector2f v = new Vector2f();
-    Vector2f v2 = new Vector2f();
+    Vector4f rect = new Vector4f();
+    Vector3f v = new Vector3f();
+    Vector3f v2 = new Vector3f();
     Vector2f p = new Vector2f();
     ByteBuffer charBuffer = BufferUtils.createByteBuffer(32 * 270);
-    float textScale = 2.6f;
+    float textScale = 3.1f;
     float maxTicks = 17.0f;
 
     DecimalFormat frmt = new DecimalFormat("0.###");
@@ -79,7 +81,7 @@ public class CoordinateSystemDemo {
     void toWorld(float x, float y) {
         float nx = (float) x / width * 2.0f - 1.0f;
         float ny = (float) (height - y) / height * 2.0f - 1.0f;
-        invViewProj.transformPosition(v.set(nx, ny));
+        cam.invviewproj().transformPosition(v.set(nx, ny, 0));
     }
 
     void init() {
@@ -105,64 +107,28 @@ public class CoordinateSystemDemo {
         });
         glfwSetCursorPosCallback(window, cpCallback = new GLFWCursorPosCallback() {
             public void invoke(long window, double x, double y) {
-                float mouseX = (float)x;
-                float mouseY = (float)y;
-                float aspect = (float)width / height;
-                float mouseNX = ((float) x / width * 2.0f - 1.0f) * aspect;
-                float mouseNY = (float) (height - y) / height * 2.0f - 1.0f;
-                if (translate) {
-                    toWorld(mouseX, mouseY);
-                    float wx = v.x, wy = v.y;
-                    toWorld(oldMouseX, oldMouseY);
-                    float wx2 = v.x, wy2 = v.y;
-                    float dx = wx - wx2, dy = wy - wy2;
-                    viewMatrix.translate(dx, dy);
-                } else if (rotate) {
-                    float angle = (float) Math.atan2(mouseNX * oldMouseNY - mouseNY * oldMouseNX, mouseNX * oldMouseNX + mouseNY * oldMouseNY);
-                    tmp.rotation(-angle).mul(viewMatrix, viewMatrix);
-                }
-                oldMouseX = mouseX;
-                oldMouseY = mouseY;
-                oldMouseNX = mouseNX;
-                oldMouseNY = mouseNY;
+                cam.onMouseMove((int) x, height - (int) y);
+                mouseX = (float) x;
+                mouseY = (float) y;
             }
         });
         glfwSetScrollCallback(window, sCallback = new GLFWScrollCallback() {
             public void invoke(long window, double xoffset, double yoffset) {
-                float scale = 1.0f;
+                float scale;
                 if (yoffset > 0.0) {
                     scale = 1.2f;
-                } else if (yoffset < 0.0) {
+                } else {
                     scale = 1.0f / 1.2f;
                 }
-//                tmp.translation(oldMouseNX, oldMouseNY, 0)
-//                   .scale(scale)
-//                   .translate(-oldMouseNX, -oldMouseNY, 0)
-//                   .mulAffine(viewMatrix, viewMatrix);
-                viewMatrix.scaleAroundLocal(scale, oldMouseNX, oldMouseNY);
+                cam.zoom(scale);
             }
         });
         glfwSetMouseButtonCallback(window, mbCallback = new GLFWMouseButtonCallback() {
             public void invoke(long window, int button, int action, int mods) {
-                if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT) {
-                    translate = true;
-                    rotate = false;
-                } else if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_RIGHT) {
-                    translate = false;
-                    rotate = true;
-                } else if (action == GLFW_RELEASE) {
-                    translate = false;
-                    rotate = false;
-                } else if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_MIDDLE) {
-                    viewMatrix.positiveX(v);
-                    float xx = v.x, xy = v.y;
-                    viewMatrix.positiveY(v);
-                    float yx = v.x, yy = v.y;
-                    tmp.set(xx, xy, 
-                            yx, yy, 
-                            0,  0)
-                       .mul(viewMatrix, viewMatrix);
-                }
+                if (action == GLFW_PRESS)
+                    cam.onMouseDown(button);
+                else
+                    cam.onMouseUp(button);
             }
         });
         glfwSetFramebufferSizeCallback(window, fbCallback = new GLFWFramebufferSizeCallback() {
@@ -178,6 +144,7 @@ public class CoordinateSystemDemo {
                 if (w > 0 && h > 0) {
                     width = w;
                     height = h;
+                    cam.setSize(w, h);
                 }
             }
         });
@@ -187,37 +154,22 @@ public class CoordinateSystemDemo {
         nglfwGetFramebufferSize(window, memAddress(framebufferSize), memAddress(framebufferSize) + 4);
         fbWidth = framebufferSize.get(0);
         fbHeight = framebufferSize.get(1);
-    }
-
-    void computeVisibleExtents() {
-        minX = Float.POSITIVE_INFINITY;
-        minY = Float.POSITIVE_INFINITY;
-        maxX = Float.NEGATIVE_INFINITY;
-        maxY = Float.NEGATIVE_INFINITY;
-        for (int i = 0; i < 4; i++) {
-            float x = ((i & 1) << 1) - 1.0f;
-            float y = (((i >>> 1) & 1) << 1) - 1.0f;
-            invViewProj.transformPosition(v.set(x, y));
-            minX = minX < v.x ? minX : v.x;
-            minY = minY < v.y ? minY : v.y;
-            maxX = maxX > v.x ? maxX : v.x;
-            maxY = maxY > v.y ? maxY : v.y;
-        }
+        cam.setSize(width, height);
     }
 
     float stippleOffsetY(int width) {
-        invViewProj.unprojectInv(0, 0, viewport, v);
+        cam.invviewproj().unprojectInv(0, 0, 0, viewport, v);
         float x0 = v.x, y0 = v.y;
-        invViewProj.unprojectInv(0, width, viewport, v);
+        cam.invviewproj().unprojectInv(0, width, 0, viewport, v);
         float x1 = v.x, y1 = v.y;
         float len = (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
         return y0 % len - len * 0.25f;
     }
 
     float stippleOffsetX(int width) {
-        invViewProj.unprojectInv(0, 0, viewport, v);
+        cam.invviewproj().unprojectInv(0, 0, 0, viewport, v);
         float x0 = v.x, y0 = v.y;
-        invViewProj.unprojectInv(width, 0, viewport, v);
+        cam.invviewproj().unprojectInv(width, 0, 0, viewport, v);
         float x1 = v.x, y1 = v.y;
         float len = (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
         return x0 % len - len * 0.25f;
@@ -244,23 +196,28 @@ public class CoordinateSystemDemo {
     }
 
     float diagonal() {
-        invViewProj.transformPosition(v.set(-1, -1));
+        cam.invviewproj().transformPosition(v.set(-1, -1, 0));
         float x = v.x, y = v.y;
-        invViewProj.transformPosition(v.set(+1, +1));
+        cam.invviewproj().transformPosition(v.set(+1, +1, 0));
         float x2 = v.x, y2 = v.y;
         return (float) Math.sqrt((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y));
     }
 
     float px(int px) {
-        invViewProj.unprojectInv(0, 0, viewport, v);
+        cam.invviewproj().unprojectInv(0, 0, 0, viewport, v);
         float x0 = v.x, y0 = v.y;
-        invViewProj.unprojectInv(px, 0, viewport, v);
+        cam.invviewproj().unprojectInv(px, 0, 0, viewport, v);
         float x1 = v.x, y1 = v.y;
         return (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
     }
 
     void renderGrid() {
-        glColor3f(0.5f, 0.5f, 0.5f);
+        Vector2f min = new Vector2f();
+        Vector2f v0 = new Vector2f();
+        Vector2f v1 = new Vector2f();
+        cam.viewSpan(min, v0, v1);
+        glColor3f(0.6f, 0.6f, 0.6f);
+        glLineWidth(2.1f);
         glBegin(GL_LINES);
         float sx = stippleOffsetX(16);
         float sy = stippleOffsetY(16);
@@ -277,8 +234,9 @@ public class CoordinateSystemDemo {
             glVertex2f(0, y);
         }
         glEnd();
+        glLineWidth(1.2f);
         glEnable(GL_LINE_STIPPLE);
-        glLineStipple(1, (short) 0x8888);
+        glLineStipple(1, (short) 0xFC);
         glBegin(GL_LINES);
         float ticks = tick(diagonal(), maxTicks);
         startX = ticks * (float) Math.floor(minX / ticks);
@@ -295,7 +253,7 @@ public class CoordinateSystemDemo {
         glDisable(GL_LINE_STIPPLE);
 
         // Main axes
-        glLineWidth(1.5f);
+        glLineWidth(1.7f);
         glBegin(GL_LINES);
         glColor3f(0.5f, 0.2f, 0.2f);
         glVertex2f(minX, 0);
@@ -308,7 +266,7 @@ public class CoordinateSystemDemo {
 
         // unit square
         glColor3f(0.2f, 0.4f, 0.6f);
-        glLineWidth(1.7f);
+        glLineWidth(1.9f);
         glBegin(GL_LINES);
         for (int i = -1; i <= +1; i++) {
             if (i == 0)
@@ -323,24 +281,24 @@ public class CoordinateSystemDemo {
     }
 
     boolean snapX(float edge, float x2, float y2, float x3, float y3) {
-        invViewProj.transformPosition(v2.set(edge, +1));
+        cam.invviewproj().transformPosition(v2.set(edge, +1, 0));
         float x0 = v2.x, y0 = v2.y;
-        invViewProj.transformPosition(v2.set(edge, -1));
+        cam.invviewproj().transformPosition(v2.set(edge, -1, 0));
         float x1 = v2.x, y1 = v2.y;
         if (Intersectionf.intersectLineLine(x0, y0, x1, y1, x2, y2, x3, y3, p)) {
-            viewProjMatrix.transformPosition(v2.set(p.x, p.y));
+            cam.viewproj().transformPosition(v2.set(p.x, p.y, 0));
             return v2.x >= -1.1f && v2.y >= -1.1f && v2.x <= 1.1f && v2.y <= 1.1f;
         }
         return false;
     }
 
     boolean snapY(float edge, float x2, float y2, float x3, float y3) {
-        invViewProj.transformPosition(v2.set(-1, edge));
+        cam.invviewproj().transformPosition(v2.set(-1, edge, 0));
         float x0 = v2.x, y0 = v2.y;
-        invViewProj.transformPosition(v2.set(+1, edge));
+        cam.invviewproj().transformPosition(v2.set(+1, edge, 0));
         float x1 = v2.x, y1 = v2.y;
         if (Intersectionf.intersectLineLine(x0, y0, x1, y1, x2, y2, x3, y3, p)) {
-            viewProjMatrix.transformPosition(v2.set(p.x, p.y));
+            cam.viewproj().transformPosition(v2.set(p.x, p.y, 0));
             return v2.x >= -1.1f && v2.y >= -1.1f && v2.x <= 1.1f && v2.y <= 1.1f;
         }
         return false;
@@ -364,15 +322,15 @@ public class CoordinateSystemDemo {
         glPushMatrix();
         float subticks = tick(diagonal(), maxTicks);
         float startX = subticks * (float) Math.floor(minX / subticks);
-        float xoff = 6.0f / width;
-        float yoff = 6.0f / height;
+        float xoff = 8.0f / width;
+        float yoff = 8.0f / height;
         for (float x = startX; x <= maxX; x += subticks) {
             if (Math.abs(x) < 1E-5f)
                 continue;
             String text = frmt.format(x);
             float textWidth = textWidth(text);
             float textHeight = textHeight(text);
-            viewProjMatrix.transformPosition(v.set(x, 0));
+            cam.viewproj().transformPosition(v.set(x, 0, 0));
             if (v.x < -1 && snapX(-1, x, -1, x, +1)) {
                 glColor3f(0.5f, 0.3f, 0.3f);
                 v.set(v2);
@@ -392,6 +350,7 @@ public class CoordinateSystemDemo {
             } else {
                 glColor3f(0.3f, 0.3f, 0.3f);
                 v.y -= yoff;
+                v.x += xoff;
             }
             glLoadIdentity();
             glTranslatef(v.x, v.y, 0);
@@ -406,7 +365,7 @@ public class CoordinateSystemDemo {
             String text = frmt.format(y);
             float textWidth = textWidth(text);
             float textHeight = textHeight(text);
-            viewProjMatrix.transformPosition(v.set(0, y));
+            cam.viewproj().transformPosition(v.set(0, y, 0));
             if (v.y < -1 && snapY(-1, -1, y, +1, y)) {
                 glColor3f(0.3f, 0.5f, 0.3f);
                 v.set(v2);
@@ -449,10 +408,10 @@ public class CoordinateSystemDemo {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        invViewProj.unprojectInv(oldMouseX, height - oldMouseY, viewport, v);
+        cam.invviewproj().unprojectInv(mouseX, height - mouseY, 0, viewport, v);
         String str = frmt.format(v.x) + "\n" + frmt.format(v.y);
-        float ndcX = (oldMouseX-viewport[0])/viewport[2]*2.0f-1.0f;
-        float ndcY = (viewport[3]-oldMouseY-viewport[1])/viewport[3]*2.0f-1.0f;
+        float ndcX = (mouseX-viewport[0])/viewport[2]*2.0f-1.0f;
+        float ndcY = (viewport[3]-mouseY-viewport[1])/viewport[3]*2.0f-1.0f;
         glTranslatef(ndcX, ndcY, 0);
         int quads = stb_easy_font_print(0, 0, str, null, charBuffer);
         glScalef(textScale / width, -textScale / height, 0.0f);
@@ -465,6 +424,14 @@ public class CoordinateSystemDemo {
         glPopMatrix();
     }
 
+    private void computeVisibleExtents() {
+        cam.viewRect(rect);
+        minX = rect.x;
+        minY = rect.y;
+        maxX = rect.z;
+        maxY = rect.w;
+    }
+
     void loop() {
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
@@ -473,17 +440,13 @@ public class CoordinateSystemDemo {
             glfwPollEvents();
             glViewport(0, 0, fbWidth, fbHeight);
             viewport[2] = fbWidth; viewport[3] = fbHeight;
-            float aspect = (float) width / height;
             glClear(GL_COLOR_BUFFER_BIT);
-            viewProjMatrix.setView(-aspect, +aspect, -1, +1)
-                          .mul(viewMatrix)
-                          .invert(invViewProj);
             computeVisibleExtents();
             glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(viewProjMatrix.get4x4(fb));
+            glLoadMatrixf(cam.viewproj().get(fb));
             renderGrid();
             renderTickLabels();
-            renderMouseCursorCoordinates();
+            //renderMouseCursorCoordinates();
             glfwSwapBuffers(window);
         }
     }
