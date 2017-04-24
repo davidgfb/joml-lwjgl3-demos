@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Random;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -36,6 +37,7 @@ public class OrthoDemo {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         if (!glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
+        glfwWindowHint(GLFW_SAMPLES, 4);
         long window = glfwCreateWindow(windowWidth, windowHeight, "Hello Orthographic Projection!", NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
@@ -93,13 +95,15 @@ public class OrthoDemo {
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
         glClearColor(0.97f, 0.97f, 0.97f, 1.0f);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         int program = glCreateProgram();
         int vs = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vs, "uniform mat4 projMatrix;" + "void main(void) {" + "  gl_Position = projMatrix * gl_Vertex;" + "}");
         glCompileShader(vs);
         glAttachShader(program, vs);
         int fs = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs, "void main(void) {" + "  gl_FragColor = vec4(0.2, 0.2, 0.2, 1.0);" + "}");
+        glShaderSource(fs, "void main(void) {" + "  gl_FragColor = vec4(0.2, 0.2, 0.2, 0.6);" + "}");
         glCompileShader(fs);
         glAttachShader(program, fs);
         glLinkProgram(program);
@@ -108,6 +112,7 @@ public class OrthoDemo {
 
         /* Game loop */
         FloatBuffer fb = BufferUtils.createFloatBuffer(16);
+        Random rnd = new Random();
         while (!glfwWindowShouldClose(window)) {
             glViewport(0, 0, fbWidth, fbHeight);
             glClear(GL_COLOR_BUFFER_BIT);
@@ -115,12 +120,18 @@ public class OrthoDemo {
             /* Upload matrix to shader program */
             glUniformMatrix4fv(matLocation, false, cam.viewproj().get(fb));
 
-            /* Draw a simple quad */
+            /* Draw a few simple quads */
             glBegin(GL_QUADS);
-            glVertex2f(100, 100);
-            glVertex2f(200, 100);
-            glVertex2f(200, 200);
-            glVertex2f(100, 200);
+            rnd.setSeed(0L);
+            for (int i = 0; i < 50; i++) {
+                float x = (rnd.nextFloat() * 2.0f - 1.0f) * 1000.0f;
+                float y = (rnd.nextFloat() * 2.0f - 1.0f) * 1000.0f;
+                float s = (rnd.nextFloat() + 0.2f) * 100.0f;
+                glVertex2f(x, y);
+                glVertex2f(x + s, y);
+                glVertex2f(x + s, y + s);
+                glVertex2f(x, y + s);
+            }
             glEnd();
 
             glfwSwapBuffers(window);
