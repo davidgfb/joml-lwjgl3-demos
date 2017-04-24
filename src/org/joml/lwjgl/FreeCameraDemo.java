@@ -27,6 +27,7 @@ public class FreeCameraDemo {
     int fbHeight = 600;
     float mouseX, mouseY;
     boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST];
+    boolean thirdPerson;
 
     FreeCamera cam = new FreeCamera();
     {
@@ -67,6 +68,7 @@ public class FreeCameraDemo {
         System.out.println("Press A/D to strave left/right.");
         System.out.println("Press Q/E to roll left/right.");
         System.out.println("Press Spacebar/Left Ctrl to move up/down.");
+        System.out.println("Press T to toggle between first/third person.");
         System.out.println("Move the mouse to rotate around.");
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             @Override
@@ -76,6 +78,8 @@ public class FreeCameraDemo {
 
                 if (action == GLFW_PRESS || action == GLFW_REPEAT) {
                     keyDown[key] = true;
+                    if (key == GLFW_KEY_T)
+                        thirdPerson = !thirdPerson;
                 } else {
                     keyDown[key] = false;
                 }
@@ -214,12 +218,13 @@ public class FreeCameraDemo {
             glMatrixMode(GL_PROJECTION);
             glLoadMatrixf(mat.setPerspective((float) Math.toRadians(45), (float) width / height, 0.01f, 100.0f).get(fb));
 
-            /*
-             * Obtain the camera's view matrix
-             */
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(cam.view().get(fb));
-
+            mat.identity();
+            if (thirdPerson) {
+                glLoadMatrixf(mat.translation(0, -1.0f, -5.0f).get(fb));
+                renderCube(); // <- as the player
+            }
+            glLoadMatrixf(mat.mulAffine(cam.view()).get(fb));
             renderGrid();
             renderCube();
 
