@@ -8,6 +8,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.camera.FreeCamera;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
@@ -31,7 +32,7 @@ public class FreeCameraDemo {
 
     FreeCamera cam = new FreeCamera();
     {
-        cam.view().translate(-1, -5, -10);
+        cam.position.set(1, 5, 10);
     }
 
     void run() {
@@ -185,32 +186,32 @@ public class FreeCameraDemo {
         // Remember the current time.
         long lastTime = System.nanoTime();
 
+        Vector3f tmp = new Vector3f();
         Matrix4f mat = new Matrix4f();
         // FloatBuffer for transferring matrices to OpenGL
         FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 
         while (!glfwWindowShouldClose(window)) {
-            /* Compute delta time */
-            long thisTime = System.nanoTime();
-            float dt = (float) ((thisTime - lastTime) / 1E9);
-            lastTime = thisTime;
-
             // Update camera input
             cam.linearAcc.zero();
             float accFactor = 6.0f;
             float rotateZ = 0.0f;
-            if (keyDown[GLFW_KEY_W]) cam.linearAcc.z -= accFactor;
-            if (keyDown[GLFW_KEY_S]) cam.linearAcc.z += accFactor;
-            if (keyDown[GLFW_KEY_D]) cam.linearAcc.x += accFactor;
-            if (keyDown[GLFW_KEY_A]) cam.linearAcc.x -= accFactor;
-            if (keyDown[GLFW_KEY_SPACE]) cam.linearAcc.y += accFactor;
-            if (keyDown[GLFW_KEY_LEFT_CONTROL]) cam.linearAcc.y -= accFactor;
+            if (keyDown[GLFW_KEY_W]) cam.linearAcc.fma(accFactor, cam.forward(tmp));
+            if (keyDown[GLFW_KEY_S]) cam.linearAcc.fma(-accFactor, cam.forward(tmp));
+            if (keyDown[GLFW_KEY_D]) cam.linearAcc.fma(accFactor, cam.right(tmp));
+            if (keyDown[GLFW_KEY_A]) cam.linearAcc.fma(-accFactor, cam.right(tmp));
             if (keyDown[GLFW_KEY_Q]) rotateZ -= 1.0f;
             if (keyDown[GLFW_KEY_E]) rotateZ += 1.0f;
+            if (keyDown[GLFW_KEY_SPACE]) cam.linearAcc.fma(accFactor, cam.up(tmp));
+            if (keyDown[GLFW_KEY_LEFT_CONTROL]) cam.linearAcc.fma(-accFactor, cam.up(tmp));
             cam.angularVel.set(mouseY, mouseX, rotateZ);
 
+            /* Compute delta time */
+            long thisTime = System.nanoTime();
+            float diff = (float) ((thisTime - lastTime) / 1E9);
+            lastTime = thisTime;
             /* And let the camera make its update */
-            cam.update(dt);
+            cam.update(diff);
 
             glViewport(0, 0, fbWidth, fbHeight);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -224,7 +225,7 @@ public class FreeCameraDemo {
                 glLoadMatrixf(mat.translation(0, -1.0f, -5.0f).get(fb));
                 renderCube(); // <- as the player
             }
-            glLoadMatrixf(mat.mulAffine(cam.view()).get(fb));
+            glLoadMatrixf(cam.apply(mat).get(fb));
             renderGrid();
             renderCube();
 
