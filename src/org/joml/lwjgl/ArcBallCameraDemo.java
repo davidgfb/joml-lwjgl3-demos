@@ -130,15 +130,16 @@ public class ArcBallCameraDemo {
             glMatrixMode(GL_MODELVIEW);
             // Load arcball camera view matrix into 'mat':
             glLoadMatrixf(
-                    mat.translation(0, 0, -zoom)
-                       .rotateX(pitch)
-                       .rotateY(yaw)
-                       .translate(-center.x, -center.y, -center.z)
-                       .get(fb));
+                mat.translation(0, 0, -zoom)
+                   .rotateX(pitch)
+                   .rotateY(yaw)
+                   .translate(-center.x, -center.y, -center.z)
+                   .get(fb));
             renderGrid();
             // apply model transformation to 'mat':
-            mat.translate(center).get(fb);
-            glLoadMatrixf(fb);
+            glLoadMatrixf(
+                mat.translate(center)
+                   .get(fb));
             renderCube();
             glfwSwapBuffers(window);
             glfwPollEvents();
